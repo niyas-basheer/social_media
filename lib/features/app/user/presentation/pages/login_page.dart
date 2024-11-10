@@ -1,8 +1,10 @@
-
 import 'package:country_pickers/country.dart';
 import 'package:country_pickers/country_pickers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 import 'package:test_server_app/features/app/const/app_const.dart';
 import 'package:test_server_app/features/app/home/home_page.dart';
 import 'package:test_server_app/features/app/theme/style.dart';
@@ -22,7 +24,7 @@ class _LoginPageState extends State<LoginPage> {
 
   final TextEditingController _phoneController = TextEditingController();
 
-  static Country _selectedFilteredDialogCountry = CountryPickerUtils.getCountryByPhoneCode("92");
+  static Country _selectedFilteredDialogCountry = CountryPickerUtils.getCountryByPhoneCode("91");
   String _countryCode = _selectedFilteredDialogCountry.phoneCode;
 
   String _phoneNumber = "";
@@ -33,33 +35,55 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  Future<void> sendOtp(String phoneNumber) async {
+    final response = await http.post(
+      Uri.parse('http://10.0.2.2:5001/api/users/request_otp'), // Replace with your backend URL
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'phone': phoneNumber,}),
+    );
+    print(response.body);
+    if (response.statusCode == 200) {
+
+      final result = jsonDecode(response.body);
+
+      if (result['message'] == 'OTP sent successfully.') {
+        print('OTP sent successfully');
+      } else {
+        throw Exception('Failed to send OTP');
+      }
+    } else {
+      throw Exception('Failed to send OTP');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<CredentialCubit, CredentialState>(
       listener: (context, credentialListenerState) {
-        if(credentialListenerState is CredentialSuccess) {
+        if (credentialListenerState is CredentialSuccess) {
           BlocProvider.of<AuthCubit>(context).loggedIn();
         }
-        if(credentialListenerState is CredentialFailure) {
-           toast("Something went wrong");
+        if (credentialListenerState is CredentialFailure) {
+          toast("Something went wrong");
         }
       },
       builder: (context, credentialBuilderState) {
-        if(credentialBuilderState is CredentialLoading) {
-          return const Center(child: CircularProgressIndicator(color: tabColor,),);
+        if (credentialBuilderState is CredentialLoading) {
+          return const Center(
+            child: CircularProgressIndicator(color: tabColor),
+          );
         }
-        if(credentialBuilderState is CredentialPhoneAuthSmsCodeReceived) {
-          return const OtpPage();
+        if (credentialBuilderState is CredentialPhoneAuthSmsCodeReceived) {
+          return OtpPage(phoneNumber:_phoneNumber ,);
         }
-        if(credentialBuilderState is CredentialPhoneAuthProfileInfo) {
+        if (credentialBuilderState is CredentialPhoneAuthProfileInfo) {
           return InitialProfileSubmitPage(phoneNumber: _phoneNumber);
         }
-        if(credentialBuilderState is CredentialSuccess) {
+        if (credentialBuilderState is CredentialSuccess) {
           return BlocBuilder<AuthCubit, AuthState>(
-            builder: (context, authState){
-              if(authState is Authenticated) {
-                return HomePage(uid: authState.uid,);
+            builder: (context, authState) {
+              if (authState is Authenticated) {
+                return HomePage(uid: authState.uid);
               }
               return _bodyWidget();
             },
@@ -79,26 +103,23 @@ class _LoginPageState extends State<LoginPage> {
             Expanded(
               child: Column(
                 children: [
-                  const SizedBox(
-                    height: 40,
-                  ),
+                  const SizedBox(height: 40),
                   const Center(
                     child: Text(
                       "Verify your phone number",
                       style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: tabColor),
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: tabColor,
+                      ),
                     ),
                   ),
                   const Text(
-                    "WhatsApp Clone will send you SMS message (carrier charges may apply) to verify your phone number. Enter the country code and phone number",
+                    "WhatsApp Clone will send you an SMS message (carrier charges may apply) to verify your phone number. Enter the country code and phone number.",
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 15),
                   ),
-                  const SizedBox(
-                    height: 30,
-                  ),
+                  const SizedBox(height: 30),
                   ListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 2),
                     onTap: _openFilteredCountryPickerDialog,
@@ -109,40 +130,37 @@ class _LoginPageState extends State<LoginPage> {
                       Container(
                         decoration: const BoxDecoration(
                           border: Border(
-                            bottom: BorderSide(
-                              width: 1.50,
-                              color: tabColor,
-                            ),
+                            bottom: BorderSide(width: 1.50, color: tabColor),
                           ),
                         ),
                         width: 80,
                         height: 42,
                         alignment: Alignment.center,
                         child: Text(
-                            _selectedFilteredDialogCountry.phoneCode),
+                          _selectedFilteredDialogCountry.phoneCode,
+                        ),
                       ),
-                      const SizedBox(
-                        width: 8.0,
-                      ),
+                      const SizedBox(width: 8.0),
                       Expanded(
                         child: Container(
                           height: 40,
                           margin: const EdgeInsets.only(top: 1.5),
                           decoration: const BoxDecoration(
-                              border: Border(
-                                  bottom:
-                                  BorderSide(color: tabColor, width: 1.5))),
+                            border: Border(
+                              bottom: BorderSide(color: tabColor, width: 1.5),
+                            ),
+                          ),
                           child: TextField(
                             controller: _phoneController,
                             decoration: const InputDecoration(
-                                hintText: "Phone Number",
-                                border: InputBorder.none),
+                              hintText: "Phone Number",
+                              border: InputBorder.none,
+                            ),
                           ),
                         ),
                       ),
                     ],
                   ),
-
                 ],
               ),
             ),
@@ -160,14 +178,14 @@ class _LoginPageState extends State<LoginPage> {
                   child: Text(
                     "Next",
                     style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500),
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ),
             ),
-
           ],
         ),
       ),
@@ -176,29 +194,25 @@ class _LoginPageState extends State<LoginPage> {
 
   void _openFilteredCountryPickerDialog() {
     showDialog(
-        context: context,
-        builder: (_) =>
-            Theme(
-                data: Theme.of(context).copyWith(
-                  primaryColor: tabColor,
-                ),
-                child: CountryPickerDialog(
-                  titlePadding: const EdgeInsets.all(8.0),
-                  searchCursorColor: tabColor,
-                  searchInputDecoration: const InputDecoration(
-                    hintText: "Search",
-                  ),
-                  isSearchable: true,
-                  title: const Text("Select your phone code"),
-                  onValuePicked: (Country country) {
-                    setState(() {
-                      _selectedFilteredDialogCountry = country;
-                      _countryCode = country.phoneCode;
-                    });
-                  },
-                  itemBuilder: _buildDialogItem,
-                )
-            ));
+      context: context,
+      builder: (_) => Theme(
+        data: Theme.of(context).copyWith(primaryColor: tabColor),
+        child: CountryPickerDialog(
+          titlePadding: const EdgeInsets.all(8.0),
+          searchCursorColor: tabColor,
+          searchInputDecoration: const InputDecoration(hintText: "Search"),
+          isSearchable: true,
+          title: const Text("Select your phone code"),
+          onValuePicked: (Country country) {
+            setState(() {
+              _selectedFilteredDialogCountry = country;
+              _countryCode = country.phoneCode;
+            });
+          },
+          itemBuilder: _buildDialogItem,
+        ),
+      ),
+    );
   }
 
   Widget _buildDialogItem(Country country) {
@@ -206,34 +220,43 @@ class _LoginPageState extends State<LoginPage> {
       height: 40,
       alignment: Alignment.center,
       decoration: const BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: tabColor, width: 1.5),
-        ),
+        border: Border(bottom: BorderSide(color: tabColor, width: 1.5)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           CountryPickerUtils.getDefaultFlagImage(country),
           Text(" +${country.phoneCode}"),
-          Expanded(child: Text(
-            " ${country.name}", maxLines: 1, overflow: TextOverflow.ellipsis,)),
+          Expanded(
+            child: Text(
+              " ${country.name}",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
           const Spacer(),
-          const Icon(Icons.arrow_drop_down)
+          const Icon(Icons.arrow_drop_down),
         ],
       ),
     );
   }
 
-  void _submitVerifyPhoneNumber() {
-    if (_phoneController.text.isNotEmpty) {
-      _phoneNumber="+$_countryCode${_phoneController.text}";
-      print("phoneNumber $_phoneNumber");
+  void _submitVerifyPhoneNumber() async {
+  if (_phoneController.text.isNotEmpty) {
+    _phoneNumber = "+$_countryCode${_phoneController.text}";
+    print("phoneNumber $_phoneNumber");
+
+    try {
+      await sendOtp(_phoneNumber);
       BlocProvider.of<CredentialCubit>(context).submitVerifyPhoneNumber(
         phoneNumber: _phoneNumber,
       );
-    } else {
-      // toast("Enter your phone number");
+    } catch (e) {
+      print("Failed to send OTP: $e");
+      // Show a message to the user about the failure
     }
+  } else {
+    toast("Enter your phone number");
   }
-
+}
 }

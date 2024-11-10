@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:test_server_app/features/app/const/app_const.dart';
+import 'package:test_server_app/features/app/global/widgets/profile_widget.dart';
 import 'package:test_server_app/features/app/theme/style.dart';
 import 'package:test_server_app/features/app/user/data/models/user_model.dart';
 import 'package:test_server_app/features/app/user/domain/entities/user_entity.dart';
@@ -74,7 +75,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(75),
-                        // child: profileWidget(imageUrl: widget.currentUser.profileUrl, image: _image),
+                         child: profileWidget(imageUrl: widget.currentUser.profileUrl, image: _image),
                       ),
                     ),
                     Positioned(
