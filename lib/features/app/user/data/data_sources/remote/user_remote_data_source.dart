@@ -3,12 +3,13 @@
 
 import 'package:test_server_app/features/app/user/data/models/user_model.dart';
 import 'package:test_server_app/features/app/user/domain/entities/contact_entity.dart';
+import 'package:test_server_app/features/app/user/domain/entities/otp_entity.dart';
 
 abstract class UserRemoteDataSource {
 
-  Future<void> verifyPhoneNumber(String phoneNumber);
+  Future<String> verifyPhoneNumber(String phoneNumber,String otp);
   Future<void> signInWithPhoneNumber(String smsPinCode);
-
+  Future<String> resendOtp(String phoneNumber);
   Future<bool> isSignIn();
   Future<void> signOut();
   Future<String> getCurrentUID();
@@ -16,6 +17,6 @@ abstract class UserRemoteDataSource {
   Future<void> updateUser(UserModel user);
   Stream<List<UserModel>> getAllUsers();
   Stream<UserModel> getSingleUser(String uid);
-
+Future<OTPResponse> sendOtp(String phoneNumber);
   Future<List<ContactEntity>> getDeviceNumber();
 }

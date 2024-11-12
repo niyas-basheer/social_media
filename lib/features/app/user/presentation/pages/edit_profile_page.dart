@@ -252,7 +252,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
           .updateUser(
               user: UserModel(
         uid: widget.currentUser.uid,
-        email: "",
         username: _usernameController.text,
         phoneNumber: widget.currentUser.phoneNumber,
         status: _aboutController.text,

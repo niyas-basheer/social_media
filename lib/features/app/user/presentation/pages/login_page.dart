@@ -1,17 +1,13 @@
+// presentation/pages/login_page.dart
 import 'package:country_pickers/country.dart';
-import 'package:country_pickers/country_pickers.dart';
+import 'package:country_pickers/country_picker_dialog.dart';
+import 'package:country_pickers/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
-import 'package:test_server_app/features/app/const/app_const.dart';
-import 'package:test_server_app/features/app/home/home_page.dart';
 import 'package:test_server_app/features/app/theme/style.dart';
-import 'package:test_server_app/features/app/user/presentation/cubit/auth/auth_cubit.dart';
-import 'package:test_server_app/features/app/user/presentation/cubit/credential/credential_cubit.dart';
-import 'package:test_server_app/features/app/user/presentation/pages/inital_profile_submit_page.dart';
+import 'package:test_server_app/features/app/user/presentation/cubit/login/login_cubit.dart';
 import 'package:test_server_app/features/app/user/presentation/pages/otp_page.dart';
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -21,73 +17,82 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-
   final TextEditingController _phoneController = TextEditingController();
+  String _phoneNumber = '';
+ static Country _selectedFilteredDialogCountry = CountryPickerUtils.getCountryByPhoneCode("91");
+ String _countryCode = _selectedFilteredDialogCountry.phoneCode;
 
-  static Country _selectedFilteredDialogCountry = CountryPickerUtils.getCountryByPhoneCode("91");
-  String _countryCode = _selectedFilteredDialogCountry.phoneCode;
-
-  String _phoneNumber = "";
+  
 
   @override
   void dispose() {
     _phoneController.dispose();
     super.dispose();
   }
-
-  Future<void> sendOtp(String phoneNumber) async {
-    final response = await http.post(
-      Uri.parse('http://10.0.2.2:5001/api/users/request_otp'), // Replace with your backend URL
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'phone': phoneNumber,}),
+ void _openFilteredCountryPickerDialog() {
+    showDialog(
+      context: context,
+      builder: (_) => Theme(
+        data: Theme.of(context).copyWith(primaryColor: tabColor),
+        child: CountryPickerDialog(
+          titlePadding: const EdgeInsets.all(8.0),
+          searchCursorColor: tabColor,
+          searchInputDecoration: const InputDecoration(hintText: "Search"),
+          isSearchable: true,
+          title: const Text("Select your phone code"),
+          onValuePicked: (Country country) {
+            setState(() {
+              _selectedFilteredDialogCountry = country;
+              _countryCode = country.phoneCode;
+            });
+          },
+          itemBuilder: _buildDialogItem,
+        ),
+      ),
     );
-    print(response.body);
-    if (response.statusCode == 200) {
-
-      final result = jsonDecode(response.body);
-
-      if (result['message'] == 'OTP sent successfully.') {
-        print('OTP sent successfully');
-      } else {
-        throw Exception('Failed to send OTP');
-      }
-    } else {
-      throw Exception('Failed to send OTP');
-    }
   }
-
+Widget _buildDialogItem(Country country) {
+    return Container(
+      height: 40,
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: tabColor, width: 1.5)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          CountryPickerUtils.getDefaultFlagImage(country),
+          Text(" +${country.phoneCode}"),
+          Expanded(
+            child: Text(
+              " ${country.name}",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const Spacer(),
+          const Icon(Icons.arrow_drop_down),
+        ],
+      ),
+    );
+  }
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<CredentialCubit, CredentialState>(
-      listener: (context, credentialListenerState) {
-        if (credentialListenerState is CredentialSuccess) {
-          BlocProvider.of<AuthCubit>(context).loggedIn();
+    return BlocConsumer<LoginCubit, LoginState>(
+      listener: (context, state) {
+        if (state is LoginOtpSent) {
+          Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => OtpPage(phoneNumber: _phoneNumber,)),
+      );
         }
-        if (credentialListenerState is CredentialFailure) {
-          toast("Something went wrong");
+        if (state is LoginFailure) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
         }
       },
-      builder: (context, credentialBuilderState) {
-        if (credentialBuilderState is CredentialLoading) {
-          return const Center(
-            child: CircularProgressIndicator(color: tabColor),
-          );
-        }
-        if (credentialBuilderState is CredentialPhoneAuthSmsCodeReceived) {
-          return OtpPage(phoneNumber:_phoneNumber ,);
-        }
-        if (credentialBuilderState is CredentialPhoneAuthProfileInfo) {
-          return InitialProfileSubmitPage(phoneNumber: _phoneNumber);
-        }
-        if (credentialBuilderState is CredentialSuccess) {
-          return BlocBuilder<AuthCubit, AuthState>(
-            builder: (context, authState) {
-              if (authState is Authenticated) {
-                return HomePage(uid: authState.uid);
-              }
-              return _bodyWidget();
-            },
-          );
+      builder: (context, state) {
+        if (state is LoginLoading) {
+          return const Center(child: CircularProgressIndicator());
         }
         return _bodyWidget();
       },
@@ -164,9 +169,9 @@ class _LoginPageState extends State<LoginPage> {
                 ],
               ),
             ),
-            GestureDetector(
-              onTap: _submitVerifyPhoneNumber,
-              child: Container(
+          GestureDetector(
+            onTap: () => _submitVerifyPhoneNumber(context),
+            child:Container(
                 margin: const EdgeInsets.only(bottom: 20),
                 width: 120,
                 height: 40,
@@ -185,78 +190,19 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _openFilteredCountryPickerDialog() {
-    showDialog(
-      context: context,
-      builder: (_) => Theme(
-        data: Theme.of(context).copyWith(primaryColor: tabColor),
-        child: CountryPickerDialog(
-          titlePadding: const EdgeInsets.all(8.0),
-          searchCursorColor: tabColor,
-          searchInputDecoration: const InputDecoration(hintText: "Search"),
-          isSearchable: true,
-          title: const Text("Select your phone code"),
-          onValuePicked: (Country country) {
-            setState(() {
-              _selectedFilteredDialogCountry = country;
-              _countryCode = country.phoneCode;
-            });
-          },
-          itemBuilder: _buildDialogItem,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDialogItem(Country country) {
-    return Container(
-      height: 40,
-      alignment: Alignment.center,
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: tabColor, width: 1.5)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          CountryPickerUtils.getDefaultFlagImage(country),
-          Text(" +${country.phoneCode}"),
-          Expanded(
-            child: Text(
-              " ${country.name}",
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
           ),
-          const Spacer(),
-          const Icon(Icons.arrow_drop_down),
         ],
       ),
+    )
     );
   }
 
-  void _submitVerifyPhoneNumber() async {
-  if (_phoneController.text.isNotEmpty) {
-    _phoneNumber = "+$_countryCode${_phoneController.text}";
-    print("phoneNumber $_phoneNumber");
-
-    try {
-      await sendOtp(_phoneNumber);
-      BlocProvider.of<CredentialCubit>(context).submitVerifyPhoneNumber(
-        phoneNumber: _phoneNumber,
-      );
-    } catch (e) {
-      print("Failed to send OTP: $e");
-      // Show a message to the user about the failure
+  void _submitVerifyPhoneNumber(BuildContext context) {
+    if (_phoneController.text.isNotEmpty) {
+      _phoneNumber = "+$_countryCode${_phoneController.text}";
+      context.read<LoginCubit>().sendOtp(_phoneNumber);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Enter your phone number")));
     }
-  } else {
-    toast("Enter your phone number");
   }
-}
 }

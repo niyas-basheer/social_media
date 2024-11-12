@@ -1,15 +1,17 @@
+import 'dart:convert';
 import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:test_server_app/features/app/const/app_const.dart';
-import 'package:test_server_app/features/app/global/widgets/profile_widget.dart';
+import 'package:http/http.dart' as http;
+import 'package:test_server_app/features/app/const/agora_config_const.dart';
+import 'package:test_server_app/features/app/home/home_page.dart';
 import 'package:test_server_app/features/app/theme/style.dart';
 
 class InitialProfileSubmitPage extends StatefulWidget {
   final String phoneNumber;
-
+  
   const InitialProfileSubmitPage({super.key, required this.phoneNumber});
 
   @override
@@ -18,70 +20,111 @@ class InitialProfileSubmitPage extends StatefulWidget {
 
 class _InitialProfileSubmitPageState extends State<InitialProfileSubmitPage> {
   final TextEditingController _usernameController = TextEditingController();
-  File? _image;
-
+  XFile? _image;
+  File? _file;
+  bool _isLoading = false;
+  String _id='';
   // Select image from gallery
-  Future<void> selectImage() async {
-    try {
-      final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+ Future<void> selectImage() async {
+  try {
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
 
-      setState(() {
-        if (pickedFile != null) {
-          _image = File(pickedFile.path);
-        } else {
-          print("No image has been selected");
-        }
-      });
-    } catch (e) {
-      toast("Some error occurred: $e");
-    }
+    setState(() {
+      if (pickedFile != null) {
+        _file = File(pickedFile.path);
+        _image = pickedFile;
+      } else {
+        print("No image selected");
+      }
+    });
+  } catch (e) {
+    toast("Some error occurred: $e");
+  }
+}
+Future<String> uploadImage() async {
+  if (_image == null) {
+    toast('no image');
+    throw 'No image selected';
   }
 
-  // Function to handle profile submission with image
+  try {
+
+    print('Image path: ${_image!.path}');
+    print('Image name: ${_image!.name}');
+
+   
+    final ref = FirebaseStorage.instance.ref('User/Images/Profile').child(_image!.name);
+
+
+    await ref.putFile(_file!);
+
+  
+    final url = await ref.getDownloadURL();
+    
+    return url;
+  } catch (e) {
+    // Provide detailed error information
+    print('Error during upload: $e');
+    throw 'Something went wrong: ${e.toString()}';
+  }
+}
+
+
+
+
   Future<void> submitProfileInfoWithImage() async {
-    if (_usernameController.text.isNotEmpty) {
-      try {
-        // Prepare the request URL
-        final Uri url = Uri.parse("https://your-backend-api-url.com/submitProfile");
-
-        // Create multipart request
-        var request = http.MultipartRequest('POST', url);
-
-        // Add fields to the request
-        request.fields['username'] = _usernameController.text;
-        request.fields['phoneNumber'] = widget.phoneNumber;
-        request.fields['status'] = "Hey There! I'm using WhatsApp Clone";
-
-        // Add image to the request if available
-        if (_image != null) {
-          request.files.add(await http.MultipartFile.fromPath(
-            'profileImage', _image!.path,
-            contentType: MediaType('image', 'jpeg'),  // Adjust mime type if needed
-          ));
-        }
-
-        // Send the request
-        var response = await request.send();
-
-        // Handle the response
-        if (response.statusCode == 200) {
-          toast("Profile updated successfully!");
-        } else {
-          toast("Profile update failed.");
-        }
-      } catch (e) {
-        toast("Error: $e");
-      }
-    } else {
+    if (_usernameController.text.isEmpty) {
       toast("Please enter a username.");
+      return;
+    }
+
+    setState(() {
+      _isLoading = true; 
+    });
+
+    try {
+    
+      String? imageUrl = await uploadImage();
+      if (imageUrl == null) return; 
+
+       final response = await http.post(
+      Uri.parse('${Config.BaseUrl}/api/users/users'), 
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'phone': widget.phoneNumber,'username':_usernameController.text,'imgURL':imageUrl}),
+    );
+     
+      if (response.statusCode == 201) {
+        toast("Profile updated successfully!");
+        final responseData = jsonDecode(response.body);
+      if (responseData['id'] is Map && responseData['id']['_id'] != null) {
+        _id = responseData['id']['_id']; // Get the ObjectId string
+      } else {
+        _id = responseData['id'].toString(); // Fallback if already in string format
+      }
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage(uid: _id,)),
+        );
+        // Proceed with next step if needed
+      } else {
+        toast("Profile update failed. Please try again.");
+      }
+    } catch (e) {
+      print(e.toString());
+      toast("Error: $e");
+    } finally {
+      setState(() {
+        _isLoading = false; // Stop loading indicator
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
+      appBar: AppBar(title: const Text("Profile Info")),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
         child: Column(
           children: [
             const SizedBox(height: 30),
@@ -103,11 +146,13 @@ class _InitialProfileSubmitPageState extends State<InitialProfileSubmitPage> {
             GestureDetector(
               onTap: selectImage,
               child: SizedBox(
-                width: 50,
-                height: 50,
+                width: 100,
+                height: 100,
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(25),
-                  child: profileWidget(image: _image),
+                  borderRadius: BorderRadius.circular(50),
+                  child: _image != null
+                      ? Image.file(_file!, fit: BoxFit.cover)
+                      : const Icon(Icons.camera_alt, size: 50, color: tabColor),
                 ),
               ),
             ),
@@ -130,9 +175,9 @@ class _InitialProfileSubmitPageState extends State<InitialProfileSubmitPage> {
             ),
             const SizedBox(height: 20),
 
-            // Next Button (to submit the profile)
+            // Submit Button (to submit the profile)
             GestureDetector(
-              onTap: submitProfileInfoWithImage, // Submit the profile info
+              onTap: _isLoading ? null : submitProfileInfoWithImage, // Disable if loading
               child: Container(
                 width: 150,
                 height: 40,
@@ -140,17 +185,24 @@ class _InitialProfileSubmitPageState extends State<InitialProfileSubmitPage> {
                   color: tabColor,
                   borderRadius: BorderRadius.circular(5),
                 ),
-                child: const Center(
-                  child: Text(
-                    "Next",
-                    style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500),
-                  ),
-                ),
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator(color: Colors.white))
+                    : const Center(
+                        child: Text(
+                          "Next",
+                          style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500),
+                        ),
+                      ),
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  // Toast function to show feedback
+  void toast(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 }

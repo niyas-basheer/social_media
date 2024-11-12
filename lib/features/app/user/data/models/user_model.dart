@@ -4,8 +4,6 @@ class UserModel extends UserEntity {
   @override
   final String? username;
   @override
-  final String? email;
-  @override
   final String? phoneNumber;
   @override
   final bool? isOnline;
@@ -18,7 +16,6 @@ class UserModel extends UserEntity {
 
   const UserModel({
     this.username,
-    this.email,
     this.phoneNumber,
     this.isOnline,
     this.uid,
@@ -26,7 +23,6 @@ class UserModel extends UserEntity {
     this.profileUrl,
   }) : super(
     username: username,
-    email: email,
     uid: uid,
     profileUrl: profileUrl,
     phoneNumber: phoneNumber,
@@ -37,7 +33,6 @@ class UserModel extends UserEntity {
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       username: json['username'],
-      email: json['email'],
       phoneNumber: json['phoneNumber'],
       isOnline: json['isOnline'],
       uid: json['uid'],
@@ -48,7 +43,6 @@ class UserModel extends UserEntity {
 
   Map<String, dynamic> toJson() => {
     'username': username,
-    'email': email,
     'phoneNumber': phoneNumber,
     'isOnline': isOnline,
     'uid': uid,
@@ -60,7 +54,6 @@ class UserModel extends UserEntity {
   String toString() {
     return 'UserModel{'
         'username: $username, '
-        'email: $email, '
         'phoneNumber: $phoneNumber, '
         'isOnline: $isOnline, '
         'uid: $uid, '
@@ -75,7 +68,6 @@ class UserModel extends UserEntity {
       other is UserModel &&
           runtimeType == other.runtimeType &&
           username == other.username &&
-          email == other.email &&
           phoneNumber == other.phoneNumber &&
           isOnline == other.isOnline &&
           uid == other.uid &&
@@ -85,7 +77,6 @@ class UserModel extends UserEntity {
   @override
   int get hashCode =>
       username.hashCode ^
-      email.hashCode ^
       phoneNumber.hashCode ^
       isOnline.hashCode ^
       uid.hashCode ^

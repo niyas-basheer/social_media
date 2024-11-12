@@ -1,7 +1,9 @@
 
+
 import 'package:test_server_app/features/app/user/data/data_sources/remote/user_remote_data_source.dart';
 import 'package:test_server_app/features/app/user/data/models/user_model.dart';
 import 'package:test_server_app/features/app/user/domain/entities/contact_entity.dart';
+import 'package:test_server_app/features/app/user/domain/entities/otp_entity.dart';
 import 'package:test_server_app/features/app/user/domain/entities/user_entity.dart';
 import 'package:test_server_app/features/app/user/domain/repository/user_repository.dart';
 
@@ -37,6 +39,13 @@ class UserRepositoryImpl implements UserRepository {
   Future<void> updateUser(UserModel user) async => remoteDataSource.updateUser(user);
 
   @override
-  Future<void> verifyPhoneNumber(String phoneNumber) async => remoteDataSource.verifyPhoneNumber(phoneNumber);
+  Future<String> verifyPhoneNumber(String phoneNumber,otp) async => remoteDataSource.verifyPhoneNumber(phoneNumber,otp);
+
+  @override
+  Future<OTPResponse> sendOtp(String phoneNumber) async => remoteDataSource.sendOtp(phoneNumber);
+  
+  @override
+  Future<String> resendOtp(String phoneNumber) async => remoteDataSource.resendOtp(phoneNumber);
+
 
 }

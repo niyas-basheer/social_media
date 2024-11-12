@@ -1,35 +1,17 @@
-part of 'credential_cubit.dart';
+// credential_state.dart
 
-abstract class CredentialState extends Equatable {
-  const CredentialState();
-}
+abstract class CredentialState {}
 
-class CredentialInitial extends CredentialState {
-  @override
-  List<Object> get props => [];
-}
+class CredentialInitial extends CredentialState {}
 
-class CredentialLoading extends CredentialState {
-  @override
-  List<Object> get props => [];
-}
+class CredentialLoading extends CredentialState {}
 
 class CredentialSuccess extends CredentialState {
-  @override
-  List<Object> get props => [];
-}
-
-class CredentialPhoneAuthSmsCodeReceived extends CredentialState {
-  @override
-  List<Object> get props => [];
-}
-
-class CredentialPhoneAuthProfileInfo extends CredentialState {
-  @override
-  List<Object> get props => [];
+  final String message;
+  CredentialSuccess(this.message);
 }
 
 class CredentialFailure extends CredentialState {
-  @override
-  List<Object> get props => [];
+  final String error;
+  CredentialFailure(this.error);
 }

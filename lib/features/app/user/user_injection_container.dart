@@ -1,11 +1,13 @@
 
 import 'package:get_it/get_it.dart';
+import 'package:test_server_app/features/app/const/agora_config_const.dart';
 import 'package:test_server_app/features/app/user/data/data_sources/remote/user_remote_data_source.dart';
 import 'package:test_server_app/features/app/user/data/data_sources/remote/user_remote_data_source_impl.dart';
 import 'package:test_server_app/features/app/user/data/repository/user_repository_impl.dart';
 import 'package:test_server_app/features/app/user/domain/repository/user_repository.dart';
 import 'package:test_server_app/features/app/user/domain/usecases/credential/get_current_uid_usecase.dart';
 import 'package:test_server_app/features/app/user/domain/usecases/credential/is_sign_in_usecase.dart';
+import 'package:test_server_app/features/app/user/domain/usecases/credential/send_otp_usecase.dart';
 import 'package:test_server_app/features/app/user/domain/usecases/credential/sign_in_with_phone_number_usecase.dart';
 import 'package:test_server_app/features/app/user/domain/usecases/credential/sign_out_usecase.dart';
 import 'package:test_server_app/features/app/user/domain/usecases/credential/verify_phone_number_usecsae.dart';
@@ -18,6 +20,7 @@ import 'package:test_server_app/features/app/user/presentation/cubit/auth/auth_c
 import 'package:test_server_app/features/app/user/presentation/cubit/credential/credential_cubit.dart';
 import 'package:test_server_app/features/app/user/presentation/cubit/get_device_number/get_device_number_cubit.dart';
 import 'package:test_server_app/features/app/user/presentation/cubit/get_single_user/get_single_user_cubit.dart';
+import 'package:test_server_app/features/app/user/presentation/cubit/login/login_cubit.dart';
 import 'package:test_server_app/features/app/user/presentation/cubit/user/user_cubit.dart';
 
 Future<void> userInjectionContainer() async {
@@ -35,18 +38,17 @@ final sl = GetIt.instance;
       updateUserUseCase: sl.call()
   ));
 
-  sl.registerFactory<GetSingleUserCubit>(() => GetSingleUserCubit(
+  sl.registerFactory<LoginCubit>(() => LoginCubit(
+      sendOtpUseCase: sl.call()
+  ));
+sl.registerFactory<GetSingleUserCubit>(() => GetSingleUserCubit(
       getSingleUserUseCase: sl.call()
   ));
-
-  sl.registerFactory<CredentialCubit>(() => CredentialCubit(
-      createUserUseCase: sl.call(),
-      signInWithPhoneNumberUseCase: sl.call(),
-      verifyPhoneNumberUseCase: sl.call()
-  ));
-
   sl.registerFactory<GetDeviceNumberCubit>(() => GetDeviceNumberCubit(
       getDeviceNumberUseCase: sl.call()
+  ));
+   sl.registerFactory<CredentialCubit>(() => CredentialCubit(
+     verifyPhoneNumberUseCase:sl.call()
   ));
 
   // * USE CASES INJECTION
@@ -79,6 +81,8 @@ final sl = GetIt.instance;
 
   sl.registerLazySingleton<GetDeviceNumberUseCase>(
           () => GetDeviceNumberUseCase(repository: sl.call()));
+  sl.registerLazySingleton<SendOtpUseCase>(
+          () => SendOtpUseCase(repository: sl.call()));        
 
   // * REPOSITORY & DATA SOURCES INJECTION
 
@@ -86,7 +90,7 @@ final sl = GetIt.instance;
           () => UserRepositoryImpl(remoteDataSource: sl.call()));
 
   sl.registerLazySingleton<UserRemoteDataSource>(() => UserRemoteDataSourceImpl(
-     baseUrl: 'mongodb+srv://niyasbasheer321:kzHNaL42kr1cpHWy@socialmedia.htzhn.mongodb.net/?retryWrites=true&w=majority&appName=socialMedia',
+     baseUrl: Config.BaseUrl,
   ));
 
 }

@@ -15,7 +15,7 @@ class HomePage extends StatefulWidget {
   final String uid;
   final int? index;
 
-  const HomePage({super.key, required this.uid, this.index});
+  const HomePage({super.key, required this.uid, this.index,});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -87,7 +87,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
 
   List<File>? _selectedMedia;
-  List<String>? _mediaTypes; // To store the type of each selected file
+  List<String>? _mediaTypes; 
 
   Future<void> selectMedia() async {
     setState(() {
@@ -103,10 +103,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       if (result != null) {
         _selectedMedia = result.files.map((file) => File(file.path!)).toList();
 
-        // Initialize the media types list
+      
         _mediaTypes = List<String>.filled(_selectedMedia!.length, '');
 
-        // Determine the type of each selected file
+       
         for (int i = 0; i < _selectedMedia!.length; i++) {
           String extension = path.extension(_selectedMedia![i].path)
               .toLowerCase();
