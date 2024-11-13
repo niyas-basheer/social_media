@@ -4,7 +4,7 @@ class SocketService {
   late IO.Socket socket;
 
   void initializeSocket() {
-    socket = IO.io('http:///api', <String, dynamic>{
+    socket = IO.io('http://192.168.16.42:5001', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
     });

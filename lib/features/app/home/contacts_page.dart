@@ -3,16 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_server_app/features/app/const/page_const.dart';
 import 'package:test_server_app/features/app/theme/style.dart';
-import 'package:test_server_app/features/app/user/presentation/cubit/get_device_number/get_device_number_cubit.dart';
-import 'package:test_server_app/features/app/user/presentation/cubit/get_single_user/get_single_user_cubit.dart';
-import 'package:test_server_app/features/app/user/presentation/cubit/user/user_cubit.dart';
+import 'package:test_server_app/features/user/data/data_sources/remote/user_remote_sharedprefs.dart';
+import 'package:test_server_app/features/user/presentation/cubit/get_device_number/get_device_number_cubit.dart';
+import 'package:test_server_app/features/user/presentation/cubit/get_single_user/get_single_user_cubit.dart';
+import 'package:test_server_app/features/user/presentation/cubit/user/user_cubit.dart';
 import 'package:test_server_app/features/chat/domian/entities/message_entity.dart';
 import '../global/widgets/profile_widget.dart';
 
 class ContactsPage extends StatefulWidget {
-  final String uid;
+  
 
-  const ContactsPage({super.key, required this.uid});
+  const ContactsPage({super.key,});
 
   @override
   State<ContactsPage> createState() => _ContactsPageState();
@@ -23,12 +24,20 @@ class _ContactsPageState extends State<ContactsPage> {
   void initState() {
     super.initState();
     BlocProvider.of<UserCubit>(context).getAllUsers();
-    BlocProvider.of<GetSingleUserCubit>(context).getSingleUser(uid: widget.uid);
-    BlocProvider.of<GetDeviceNumberCubit>(context).getDeviceNumber(); // Fetching device contacts
+    BlocProvider.of<GetSingleUserCubit>(context).getSingleUser();
+    BlocProvider.of<GetDeviceNumberCubit>(context).getDeviceNumber(); 
   }
+  String uid='';
+  SharedPrefs sharedPrefs = SharedPrefs();
+Future<String>getuserid()async{
 
+     uid =  await sharedPrefs.getUid()??'';
+  
+    return uid;
+  }
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text("Select Contacts"),
@@ -43,7 +52,7 @@ class _ContactsPageState extends State<ContactsPage> {
                 return BlocBuilder<UserCubit, UserState>(
                   builder: (context, state) {
                     if (state is UserLoaded) {
-                      final contacts = state.users.where((user) => user.uid != widget.uid).toList();
+                      final contacts = state.users.where((user) => user.uid != uid).toList();
 
                       if (contacts.isEmpty) {
                         return const Center(
@@ -66,7 +75,7 @@ class _ContactsPageState extends State<ContactsPage> {
                                     recipientName: contact.username,
                                     senderProfile: currentUser.profileUrl,
                                     recipientProfile: contact.profileUrl,
-                                    uid: widget.uid
+                                    uid: uid
                                   ));
                             },
                             leading: SizedBox(
@@ -74,7 +83,7 @@ class _ContactsPageState extends State<ContactsPage> {
                               height: 50,
                               child: ClipRRect(
                                   borderRadius: BorderRadius.circular(25),
-                                  // child: profileWidget(imageUrl: contact.profileUrl)
+                                   child: profileWidget(imageUrl: contact.profileUrl)
                               ),
                             ),
                             title: Text("${contact.username}"),

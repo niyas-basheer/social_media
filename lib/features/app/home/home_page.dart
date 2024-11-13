@@ -4,18 +4,25 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path/path.dart' as path;
+import 'package:test_server_app/features/app/const/page_const.dart';
+import 'package:test_server_app/features/app/home/contacts_page.dart';
+import 'package:test_server_app/features/chat/presentation/pages/chat_page.dart';
+import 'package:test_server_app/features/status/domain/entities/status_image_entity.dart';
+import 'package:test_server_app/features/status/presentation/pages/status_page.dart';
+import 'package:test_server_app/features/user/data/data_sources/remote/user_remote_sharedprefs.dart';
+import 'package:test_server_app/features/call/presentation/cubits/my_call_history/my_call_history_cubit.dart';
 import 'package:test_server_app/features/app/global/widgets/show_image_and_video_widget.dart';
 import 'package:test_server_app/features/app/theme/style.dart';
-import 'package:test_server_app/features/app/user/data/models/user_model.dart';
-import 'package:test_server_app/features/app/user/domain/entities/user_entity.dart';
-import 'package:test_server_app/features/app/user/presentation/cubit/get_single_user/get_single_user_cubit.dart';
-import 'package:test_server_app/features/app/user/presentation/cubit/user/user_cubit.dart';
+import 'package:test_server_app/features/user/data/models/user_model.dart';
+import 'package:test_server_app/features/user/domain/entities/user_entity.dart';
+import 'package:test_server_app/features/user/presentation/cubit/get_single_user/get_single_user_cubit.dart';
+import 'package:test_server_app/features/user/presentation/cubit/user/user_cubit.dart';
+import 'package:test_server_app/features/call/presentation/pages/calls_history_page.dart';
 
 class HomePage extends StatefulWidget {
-  final String uid;
   final int? index;
 
-  const HomePage({super.key, required this.uid, this.index,});
+  const HomePage({super.key, this.index,});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -25,11 +32,18 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   TabController? _tabController;
   int _currentTabIndex = 0;
+ String uid='';
+  SharedPrefs sharedPrefs = SharedPrefs();
+Future<String>getuserid()async{
 
+     uid =  await sharedPrefs.getUid()??'';
+  
+    return uid;
+  }
   @override
   void initState() {
-    BlocProvider.of<GetSingleUserCubit>(context).getSingleUser(uid: widget.uid);
-    // BlocProvider.of<MyCallHistoryCubit>(context).getMyCallHistory(uid: widget.uid);
+    BlocProvider.of<GetSingleUserCubit>(context).getSingleUser();
+     BlocProvider.of<MyCallHistoryCubit>(context).getMyCallHistory(uid: uid);
 
     WidgetsBinding.instance.addObserver(this);
     _tabController = TabController(length: 3, vsync: this);
@@ -63,7 +77,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       case AppLifecycleState.resumed:
         BlocProvider.of<UserCubit>(context).updateUser(
             user: UserModel(
-                uid: widget.uid,
+                uid: uid,
                 isOnline: true
             )
         );
@@ -73,7 +87,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       case AppLifecycleState.paused:
         BlocProvider.of<UserCubit>(context).updateUser(
             user: UserModel(
-                uid: widget.uid,
+                uid: uid,
                 isOnline: false
             )
         );
@@ -83,7 +97,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     }
   }
 
-  // final List<StatusImageEntity> _stories = [];
+   final List<StatusImageEntity> _stories = [];
 
 
   List<File>? _selectedMedia;
@@ -221,9 +235,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               controller: _tabController,
 
               children: [
-                // ChatPage(uid: widget.uid),
-                // StatusPage(currentUser: currentUser),
-                // CallHistoryPage(currentUser: currentUser,),
+                ChatPage(uid: uid),
+                StatusPage(currentUser: currentUser),
+                CallHistoryPage(currentUser: currentUser,),
               ],
             ),
           );
@@ -245,8 +259,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           return FloatingActionButton(
             backgroundColor: tabColor,
             onPressed: () {
-              // Navigator.push(context, MaterialPageRoute(builder: (context) => const ContactsPage()));
-              // Navigator.pushNamed(context, PageConst.contactUsersPage, arguments: widget.uid);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const ContactsPage()));
+              Navigator.pushNamed(context, PageConst.contactUsersPage, arguments: uid);
             },
             child: const Icon(
               Icons.message,
@@ -292,7 +306,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           return FloatingActionButton(
             backgroundColor: tabColor,
             onPressed: () {
-              // Navigator.pushNamed(context, PageConst.callContactsPage);
+               Navigator.pushNamed(context, PageConst.callContactsPage);
             },
             child: const Icon(
               Icons.add_call,

@@ -6,11 +6,11 @@ import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
 import 'package:test_server_app/features/app/const/agora_config_const.dart';
 import 'package:test_server_app/features/app/const/exceptions.dart';
-import 'package:test_server_app/features/app/user/data/data_sources/remote/user_remote_data_source.dart';
-import 'package:test_server_app/features/app/user/data/data_sources/remote/user_remote_data_source_impl.dart';
-import 'package:test_server_app/features/app/user/data/data_sources/remote/user_remote_sharedprefs.dart';
-import 'package:test_server_app/features/app/user/data/models/user_model.dart';
-import 'package:test_server_app/features/app/user/presentation/cubit/credential/credential_cubit.dart'; // Adjust based on actual file path
+import 'package:test_server_app/features/user/data/data_sources/remote/user_remote_data_source.dart';
+import 'package:test_server_app/features/user/data/data_sources/remote/user_remote_data_source_impl.dart';
+import 'package:test_server_app/features/user/data/data_sources/remote/user_remote_sharedprefs.dart';
+import 'package:test_server_app/features/user/data/models/user_model.dart';
+import 'package:test_server_app/features/user/presentation/cubit/credential/credential_cubit.dart'; // Adjust based on actual file path
  
 
 // Mock classes
@@ -20,7 +20,7 @@ class MockSharedPrefs extends Mock implements SharedPrefs {}
 void main() {
   late MockClient mockClient;
   late MockSharedPrefs mockSharedPrefs;
-  late UserRemoteDataSource userRemoteDataSource; // Replace with your class containing createUser
+  late UserRemoteDataSource userRemoteDataSource; 
 
   setUp(() {
     mockClient = MockClient();

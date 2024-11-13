@@ -4,8 +4,8 @@ import 'package:test_server_app/features/app/const/page_const.dart';
 import 'package:test_server_app/features/app/global/widgets/dialog_widget.dart';
 import 'package:test_server_app/features/app/global/widgets/profile_widget.dart';
 import 'package:test_server_app/features/app/theme/style.dart';
-import 'package:test_server_app/features/app/user/presentation/cubit/auth/auth_cubit.dart';
-import 'package:test_server_app/features/app/user/presentation/cubit/get_single_user/get_single_user_cubit.dart';
+import 'package:test_server_app/features/user/presentation/cubit/auth/auth_cubit.dart';
+import 'package:test_server_app/features/user/presentation/cubit/get_single_user/get_single_user_cubit.dart';
 
 
 class SettingsPage extends StatefulWidget {
@@ -20,7 +20,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   void initState() {
-    BlocProvider.of<GetSingleUserCubit>(context).getSingleUser(uid: widget.uid);
+    BlocProvider.of<GetSingleUserCubit>(context).getSingleUser();
     super.initState();
   }
   @override

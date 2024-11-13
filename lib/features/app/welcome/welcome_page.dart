@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:test_server_app/features/app/theme/style.dart';
-import 'package:test_server_app/features/app/user/presentation/pages/login_page.dart';
+import 'package:test_server_app/features/user/presentation/pages/login_page.dart';
 
 
 class WelcomePage extends StatelessWidget {
