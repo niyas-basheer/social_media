@@ -8,7 +8,6 @@ import 'package:test_server_app/features/user/domain/entities/otp_entity.dart';
 abstract class UserRemoteDataSource {
 
   Future<String> verifyPhoneNumber(String phoneNumber,String otp);
-  Future<void> signInWithPhoneNumber(String smsPinCode);
   Future<String> resendOtp(String phoneNumber);
   Future<bool> isSignIn();
   Future<void> signOut();

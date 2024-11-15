@@ -15,16 +15,16 @@ class StatusRepositoryImpl implements StatusRepository {
   Future<void> deleteStatus(StatusEntity status) async => remoteDataSource.deleteStatus(status);
 
   @override
-  Stream<List<StatusEntity>> getMyStatus(String uid) => remoteDataSource.getMyStatus(uid);
+  Stream<List<StatusEntity>> getMyStatus() => remoteDataSource.getMyStatus();
 
   @override
-  Future<List<StatusEntity>> getMyStatusFuture(String uid) async => remoteDataSource.getMyStatusFuture(uid);
+  Future<List<StatusEntity>> getMyStatusFuture() async => remoteDataSource.getMyStatusFuture();
 
   @override
   Stream<List<StatusEntity>> getStatuses(StatusEntity status) => remoteDataSource.getStatuses(status);
 
   @override
-  Future<void> seenStatusUpdate(String statusId, int imageIndex, String userId) async => remoteDataSource.seenStatusUpdate(statusId, imageIndex, userId);
+  Future<void> seenStatusUpdate(String statusId, int imageIndex) async => remoteDataSource.seenStatusUpdate(statusId, imageIndex);
 
   @override
   Future<void> updateOnlyImageStatus(StatusEntity status) async => remoteDataSource.updateOnlyImageStatus(status);

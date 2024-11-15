@@ -28,10 +28,6 @@ class UserRepositoryImpl implements UserRepository {
   Stream<UserModel> getSingleUser() => remoteDataSource.getSingleUser();
   @override
   Future<bool> isSignIn() async => remoteDataSource.isSignIn();
-
-  @override
-  Future<void> signInWithPhoneNumber(String smsPinCode) async => remoteDataSource.signInWithPhoneNumber(smsPinCode);
-
   @override
   Future<void> signOut() async => remoteDataSource.signOut();
 

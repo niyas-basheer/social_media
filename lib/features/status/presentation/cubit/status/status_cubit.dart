@@ -99,7 +99,7 @@ class StatusCubit extends Cubit<StatusState> {
   Future<void> seenStatusUpdate({required String statusId, required int imageIndex, required String userId}) async {
 
     try {
-      await seenStatusUpdateUseCase.call(statusId, imageIndex, userId);
+      await seenStatusUpdateUseCase.call(statusId, imageIndex);
 
     } on SocketException {
       emit(StatusFailure());

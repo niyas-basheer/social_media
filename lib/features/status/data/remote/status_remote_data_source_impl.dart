@@ -5,15 +5,17 @@ import 'package:test_server_app/features/status/data/models/status_model.dart';
 import 'package:test_server_app/features/status/data/remote/status_remote_data_source.dart';
 import 'package:test_server_app/features/status/domain/entities/status_entity.dart';
 import 'package:test_server_app/features/status/domain/entities/status_image_entity.dart';
+import 'package:test_server_app/features/user/data/data_sources/remote/user_remote_sharedprefs.dart';
 
 class StatusRemoteDataSourceImpl implements StatusRemoteDataSource {
   final String baseUrl; // The base URL of your server
 
   StatusRemoteDataSourceImpl({required this.baseUrl});
-
+  SharedPrefs sharedPrefs = SharedPrefs();
+  
   @override
   Future<void> createStatus(StatusEntity status) async {
-    final url = Uri.parse('$baseUrl/api/status/create');
+    final url = Uri.parse('$baseUrl/api/status/status');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
@@ -37,7 +39,7 @@ class StatusRemoteDataSourceImpl implements StatusRemoteDataSource {
 
   @override
   Future<void> deleteStatus(StatusEntity status) async {
-    final url = Uri.parse('$baseUrl/api/status/delete/${status.statusId}');
+    final url = Uri.parse('$baseUrl/api/status/status/${status.statusId}');
     final response = await http.delete(url);
 
     if (response.statusCode != 200) {
@@ -46,8 +48,9 @@ class StatusRemoteDataSourceImpl implements StatusRemoteDataSource {
   }
 
   @override
-  Stream<List<StatusEntity>> getMyStatus(String uid) async* {
-    final url = Uri.parse('$baseUrl/api/status/user/$uid');
+  Stream<List<StatusEntity>> getMyStatus() async* {
+    String? uid = await sharedPrefs.getUid();
+    final url = Uri.parse('$baseUrl/api/status/status/$uid');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -60,8 +63,9 @@ class StatusRemoteDataSourceImpl implements StatusRemoteDataSource {
   }
 
   @override
-  Future<List<StatusEntity>> getMyStatusFuture(String uid) async {
-    final url = Uri.parse('$baseUrl/api/status/user/$uid');
+  Future<List<StatusEntity>> getMyStatusFuture() async {
+    String? uid = await sharedPrefs.getUid();
+    final url = Uri.parse('$baseUrl/api/status/status/$uid');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -74,7 +78,7 @@ class StatusRemoteDataSourceImpl implements StatusRemoteDataSource {
 
   @override
   Stream<List<StatusEntity>> getStatuses(StatusEntity status) async* {
-    final url = Uri.parse('$baseUrl/api/status/recent');
+    final url = Uri.parse('$baseUrl/api/status/statuses');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -87,7 +91,8 @@ class StatusRemoteDataSourceImpl implements StatusRemoteDataSource {
   }
 
   @override
-  Future<void> seenStatusUpdate(String statusId, int imageIndex, String userId) async {
+  Future<void> seenStatusUpdate(String statusId, int imageIndex) async {
+    String? userId = await sharedPrefs.getUid();
     final url = Uri.parse('$baseUrl/api/status/seen');
     final response = await http.put(
       url,

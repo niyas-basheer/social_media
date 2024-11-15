@@ -7,7 +7,7 @@ class SeenStatusUpdateUseCase {
 
   const SeenStatusUpdateUseCase({required this.repository});
 
-  Future<void> call(String statusId, int imageIndex, String userId) async {
-    return await repository.seenStatusUpdate(statusId, imageIndex, userId);
+  Future<void> call(String statusId, int imageIndex,) async {
+    return await repository.seenStatusUpdate(statusId, imageIndex);
   }
 }

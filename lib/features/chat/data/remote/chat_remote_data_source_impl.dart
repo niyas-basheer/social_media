@@ -1,11 +1,10 @@
 import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:test_server_app/features/app/const/message_type_const.dart';
 import 'package:test_server_app/features/chat/data/models/chat_model.dart';
 import 'package:test_server_app/features/chat/data/models/message_model.dart';
 import 'package:test_server_app/features/chat/data/remote/chat_remote_data_source.dart';
 import 'package:test_server_app/features/chat/domian/entities/chat_entity.dart';
 import 'package:test_server_app/features/chat/domian/entities/message_entity.dart';
+import 'dart:convert';
 import 'package:uuid/uuid.dart';
 
 class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
@@ -20,16 +19,16 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     String recentTextMessage = "";
 
     switch (message.messageType) {
-      case MessageTypeConst.photoMessage:
+      case 'photoMessage':
         recentTextMessage = '📷 Photo';
         break;
-      case MessageTypeConst.videoMessage:
+      case 'videoMessage':
         recentTextMessage = '📸 Video';
         break;
-      case MessageTypeConst.audioMessage:
+      case 'audioMessage':
         recentTextMessage = '🎵 Audio';
         break;
-      case MessageTypeConst.gifMessage:
+      case 'gifMessage':
         recentTextMessage = 'GIF';
         break;
       default:
@@ -50,7 +49,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   }
 
   Future<void> addToChat(ChatEntity chat) async {
-    final url = Uri.parse('$baseUrl/api/chat/add');
+    final url = Uri.parse('$baseUrl/api/chat/messages');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
@@ -73,7 +72,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   }
 
   Future<void> sendMessageBasedOnType(MessageEntity message) async {
-    final url = Uri.parse('$baseUrl/api/message/send');
+    final url = Uri.parse('$baseUrl/api/chat/messages');
     String messageId = const Uuid().v1();
 
     final newMessage = MessageModel(
@@ -97,7 +96,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
       body: jsonEncode(newMessage),
     );
 
-    if (response.statusCode != 200) {
+    if (response.statusCode != 201) {
       print("error occur while sending message");
     }
   }
@@ -118,11 +117,11 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
 
   @override
   Future<void> deleteMessage(MessageEntity message) async {
-    final url = Uri.parse('$baseUrl/api/message/delete');
+    final url = Uri.parse('$baseUrl/api/chat/messages');
     final response = await http.delete(
       url,
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'messageId': message.messageId, 'senderUid': message.senderUid, 'recipientUid': message.recipientUid}),
+      body: jsonEncode({'messageId': message.messageId}),
     );
 
     if (response.statusCode != 200) {
@@ -132,7 +131,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
 
   @override
   Stream<List<MessageEntity>> getMessages(MessageEntity message) async* {
-    final url = Uri.parse('$baseUrl/api/message/get/${message.senderUid}/${message.recipientUid}');
+    final url = Uri.parse('$baseUrl/api/chat/messages/${message.senderUid}/${message.recipientUid}');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -160,7 +159,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
 
   @override
   Future<void> seenMessageUpdate(MessageEntity message) async {
-    final url = Uri.parse('$baseUrl/api/message/update');
+    final url = Uri.parse('$baseUrl/api/chat/messages/update');
     final response = await http.put(
       url,
       headers: {'Content-Type': 'application/json'},

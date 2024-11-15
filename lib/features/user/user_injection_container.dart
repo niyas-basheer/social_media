@@ -8,7 +8,6 @@ import 'package:test_server_app/features/user/domain/repository/user_repository.
 import 'package:test_server_app/features/user/domain/usecases/credential/get_current_uid_usecase.dart';
 import 'package:test_server_app/features/user/domain/usecases/credential/is_sign_in_usecase.dart';
 import 'package:test_server_app/features/user/domain/usecases/credential/send_otp_usecase.dart';
-import 'package:test_server_app/features/user/domain/usecases/credential/sign_in_with_phone_number_usecase.dart';
 import 'package:test_server_app/features/user/domain/usecases/credential/sign_out_usecase.dart';
 import 'package:test_server_app/features/user/domain/usecases/credential/verify_phone_number_usecsae.dart';
 import 'package:test_server_app/features/user/domain/usecases/user/create_user_usecase.dart';
@@ -72,9 +71,6 @@ sl.registerFactory<GetSingleUserCubit>(() => GetSingleUserCubit(
 
   sl.registerLazySingleton<GetSingleUserUseCase>(
           () => GetSingleUserUseCase(repository: sl.call()));
-
-  sl.registerLazySingleton<SignInWithPhoneNumberUseCase>(
-          () => SignInWithPhoneNumberUseCase(repository: sl.call()));
 
   sl.registerLazySingleton<VerifyPhoneNumberUseCase>(
           () => VerifyPhoneNumberUseCase(repository: sl.call()));

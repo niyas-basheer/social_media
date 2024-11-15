@@ -16,6 +16,8 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
 
   UserRemoteDataSourceImpl({required this.baseUrl});
   SharedPrefs sharedPrefs = SharedPrefs();
+  String userId='';
+  final sharedPrefService = SharedPrefs();
   @override
   Future<void> createUser(UserModel user) async {
     final url = Uri.parse('$baseUrl/api/users/users');
@@ -24,15 +26,8 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
       headers: {'Content-Type': 'application/json; charset=UTF-8'},
       body: jsonEncode(user.toJson()),
     );
-    if (response.statusCode != 200) {
-      final responseData = jsonDecode(response.body);
-      String userId;
-      if (responseData['id'] is Map && responseData['id']['_id'] != null) {
-        userId = responseData['id']['_id']; 
-      } else {
-        userId = responseData['id'].toString(); 
-      }
-      sharedPrefs.saveUid(userId);
+    if (response.statusCode != 201) {
+      
       throw ServerException('Failed to create user');
     }
   }
@@ -61,6 +56,7 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
 
   @override
   Future<String> getCurrentUID() async {
+    
     String? uid = await sharedPrefs.getUid();
     if (uid!=null) {
       return uid;
@@ -130,42 +126,44 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
     }
   }
 
-  @override
-  Future<void> signInWithPhoneNumber(String smsPinCode) async {
-    final url = Uri.parse('$baseUrl/api//users/login_with_otp');
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json; charset=UTF-8'},
-      body: jsonEncode({'sms_pin_code': smsPinCode}),
-    );
 
-    if (response.statusCode != 200) {
-      throw ServerException('Failed to sign in with phone number');
+
+  @override
+Future<String> verifyPhoneNumber(String phoneNumber, String otp) async {
+
+  final response = await http.post(
+    Uri.parse('$baseUrl/api/users/login_with_otp'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({'phone': phoneNumber, 'otp': otp}),
+  );
+
+
+  if (response.statusCode == 200) {
+    final result = jsonDecode(response.body);
+    
+    // Handle unexpected response structure
+    if (result == null || !result.containsKey('message')) {
+      throw Exception('Unexpected response structure');
     }
-  }
 
-  @override
-  Future<String> verifyPhoneNumber(String phoneNumber,otp) async {
-    print("Sending OTP verification request: phone=$phoneNumber, otp=$otp");
-    final response = await http.post(
-      Uri.parse('$baseUrl/api/users/login_with_otp'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'phone': phoneNumber, 'otp': otp}),
-    );
+    if (result['message'] == 'Login successful') {
+      final Map<String, dynamic> parsed = jsonDecode(response.body);
+     final userdata = UserModel.fromJson(parsed['user']);
+      
+     userId = userdata.uid ?? '';
+       sharedPrefs.saveUid(userId);
+       sharedPrefService.saveSignInStatus(true); 
 
-    if (response.statusCode == 200) {
-      final result = jsonDecode(response.body);
-      if (result['message'] == 'Login successful') {
-        print('Login successful');
-      } else {
-        throw Exception(result['error']);
-      }
       return result['message'];
     } else {
-      print("Error in login response: ${response.body}");
-      throw Exception('Failed to verify OTP');
+      // Handle server error message
+      throw Exception(result['error'] ?? 'Unknown error');
     }
+  } else {
+    // Handle HTTP errors
+    throw Exception('Failed to verify OTP. Status code: ${response.statusCode}');
   }
+}
   @override
   Future<OTPResponse> sendOtp(String phoneNumber) async {
     final response = await http.post(
@@ -183,11 +181,11 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
   }
   @override
   Future<bool> isSignIn() async{
-    String? uid = await sharedPrefs.getUid();
-    if(uid != null){
-      return true;
-    }
-    return false;
+    
+    final sharedPrefService = SharedPrefs(); 
+    bool isSignedIn = await sharedPrefService.getSignInStatus();
+    return isSignedIn;
+    
   }
   
   @override
@@ -204,12 +202,10 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
       body: jsonEncode({'phone': phoneNumber}),
     );
     final result = jsonDecode(response.body);
-    print(response.body);
     if (response.statusCode == 200) {
       
       if (result['message'] == 'OTP sent successfully') {
         toast("OTP has been resent.");
-        print('OTP sent successfully');
       } else {
         throw Exception('Failed to send OTP');
       }

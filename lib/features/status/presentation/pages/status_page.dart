@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_story_view/flutter_story_view.dart';
 import 'package:flutter_story_view/models/story_item.dart';
 import 'package:path/path.dart' as path;
+import 'package:test_server_app/features/user/data/data_sources/remote/user_remote_sharedprefs.dart';
 import 'package:test_server_app/main_injection_container.dart' as di;
 import 'package:test_server_app/features/app/const/page_const.dart';
 import 'package:test_server_app/features/app/global/date/date_formats.dart';
@@ -77,7 +78,14 @@ class _StatusPageState extends State<StatusPage> {
       print("Error while picking file: $e");
     }
   }
+String uid='';
+  SharedPrefs sharedPrefs = SharedPrefs();
+Future<String>getuserid()async{
 
+     uid =  await sharedPrefs.getUid()??'';
+  
+    return uid;
+  }
   @override
   void initState() {
     super.initState();
@@ -85,11 +93,11 @@ class _StatusPageState extends State<StatusPage> {
     BlocProvider.of<StatusCubit>(context).getStatuses(status: const StatusEntity());
 
     BlocProvider.of<GetMyStatusCubit>(context).getMyStatus(
-        uid: widget.currentUser.uid!);
+        uid: uid);
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       di.sl<GetMyStatusFutureUseCase>()
-          .call(widget.currentUser.uid!).then((myStatus) {
+          .call().then((myStatus) {
         if (myStatus.isNotEmpty && myStatus.first.stories != null) {
           _fillMyStoriesList(myStatus.first);
         }
@@ -372,7 +380,7 @@ class _StatusPageState extends State<StatusPage> {
       ));
     }
 
-    di.sl<GetMyStatusFutureUseCase>().call(widget.currentUser.uid!).then((myStatus) {
+    di.sl<GetMyStatusFutureUseCase>().call().then((myStatus) {
       if (myStatus.isNotEmpty) {
         BlocProvider.of<StatusCubit>(context)
             .updateOnlyImageStatus(status: StatusEntity(statusId: myStatus.first.statusId, stories: _stories))

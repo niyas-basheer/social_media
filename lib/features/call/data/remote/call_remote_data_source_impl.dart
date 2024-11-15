@@ -41,7 +41,7 @@ class CallRemoteDataSourceImpl implements CallRemoteDataSource {
 
   @override
   Stream<List<CallEntity>> getMyCallHistory(String uid) async* {
-    final url = Uri.parse('$baseUrl/api/calls/getMyCallHistory/$uid');
+    final url = Uri.parse('$baseUrl/api/calls/getMyCallHistory/6730bd263c4870b0ba083760');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {

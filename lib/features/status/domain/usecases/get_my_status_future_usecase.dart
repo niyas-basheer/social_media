@@ -9,7 +9,7 @@ class GetMyStatusFutureUseCase {
 
   const GetMyStatusFutureUseCase({required this.repository});
 
-  Future<List<StatusEntity>> call(String uid) async {
-    return repository.getMyStatusFuture(uid);
+  Future<List<StatusEntity>> call() async {
+    return repository.getMyStatusFuture();
   }
 }

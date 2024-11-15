@@ -7,7 +7,6 @@ import 'package:test_server_app/features/user/domain/entities/user_entity.dart';
 abstract class UserRepository {
 
   Future<String> verifyPhoneNumber(String phoneNumber,otp);
-  Future<void> signInWithPhoneNumber(String smsPinCode);
   Future<OTPResponse> sendOtp(String phoneNumber);
   Future<bool> isSignIn();
   Future<void> signOut();
