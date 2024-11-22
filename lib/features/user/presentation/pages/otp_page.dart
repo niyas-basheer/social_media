@@ -12,7 +12,7 @@ import 'package:test_server_app/features/user/presentation/pages/inital_profile_
 
 class OtpPage extends StatefulWidget {
   final String phoneNumber;
-  const OtpPage({Key? key, required this.phoneNumber}) : super(key: key);
+  const OtpPage({super.key, required this.phoneNumber});
 
   @override
   State<OtpPage> createState() => _OtpPageState();
@@ -105,9 +105,9 @@ class _OtpPageState extends State<OtpPage> {
                     ),
                     const SizedBox(height: 20),
                     const Text(
-                      "Enter your OTP for the WhatsApp Clone Verification.",
+                      "Enter your OTP for the Verification.",
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 15),
+                      style: TextStyle(fontSize: 15,color: Colors.blue),
                     ),
                     const SizedBox(height: 30),
                     _pinCodeWidget(),
@@ -160,6 +160,7 @@ class _OtpPageState extends State<OtpPage> {
       child: PinCodeFields(
         controller: _otpController,
         length: 6,
+        textStyle: TextStyle(color: Colors.blue),
         activeBorderColor: Colors.blue,
         onComplete: (String pinCode) {},
       ),

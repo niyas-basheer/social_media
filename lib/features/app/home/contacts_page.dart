@@ -11,9 +11,9 @@ import 'package:test_server_app/features/chat/domian/entities/message_entity.dar
 import '../global/widgets/profile_widget.dart';
 
 class ContactsPage extends StatefulWidget {
-  
+   final String uid;
 
-  const ContactsPage({super.key,});
+  const ContactsPage({super.key, required this.uid});
 
   @override
   State<ContactsPage> createState() => _ContactsPageState();
@@ -24,7 +24,7 @@ class _ContactsPageState extends State<ContactsPage> {
   void initState() {
     super.initState();
     BlocProvider.of<UserCubit>(context).getAllUsers();
-    BlocProvider.of<GetSingleUserCubit>(context).getSingleUser();
+    BlocProvider.of<GetSingleUserCubit>(context).getSingleUser(uid: widget.uid);
     BlocProvider.of<GetDeviceNumberCubit>(context).getDeviceNumber(); 
   }
   String uid='';
@@ -56,7 +56,7 @@ Future<String>getuserid()async{
 
                       if (contacts.isEmpty) {
                         return const Center(
-                          child: Text("No Contacts Yet"),
+                          child: Text("No Contacts Yet",style: TextStyle(color:Colors.blue),),
                         );
                       }
 
@@ -86,7 +86,7 @@ Future<String>getuserid()async{
                                    child: profileWidget(imageUrl: contact.profileUrl)
                               ),
                             ),
-                            title: Text("${contact.username}"),
+                            title: Text("${contact.username}",style: TextStyle(color:Colors.blue),),
                             subtitle: Text("${contact.status}"),
                           );
                         },
@@ -126,12 +126,12 @@ Future<String>getuserid()async{
                             child: Image.memory(
                               contact.photo ?? Uint8List(0),
                               errorBuilder: (context, error, stackTrace) {
-                                return Image.asset('assets/profile_default.png'); // Placeholder image
+                                return Image.asset('assets/profile_default.png'); 
                               },
                             ),
                           ),
                         ),
-                        title: Text("${contact.name!.first} ${contact.name!.last}"),
+                        title: Text("${contact.name!.first} ${contact.name!.last}",style: TextStyle(color:Colors.blue),),
                         subtitle: const Text("Hey there! I'm using WhatsApp"),
                       );
                     },

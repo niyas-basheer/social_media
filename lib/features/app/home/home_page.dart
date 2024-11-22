@@ -20,9 +20,10 @@ import 'package:test_server_app/features/user/presentation/cubit/user/user_cubit
 import 'package:test_server_app/features/call/presentation/pages/calls_history_page.dart';
 
 class HomePage extends StatefulWidget {
+  final String uid;
   final int? index;
 
-  const HomePage({super.key, this.index,});
+  const HomePage({super.key, required this.uid, this.index});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -35,14 +36,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
  String uid='';
   SharedPrefs sharedPrefs = SharedPrefs();
 Future<String>getuserid()async{
-
+    print('hello');
      uid =  await sharedPrefs.getUid()??'';
-  
     return uid;
   }
   @override
   void initState() {
-    BlocProvider.of<GetSingleUserCubit>(context).getSingleUser();
+    getuserid();
+    BlocProvider.of<GetSingleUserCubit>(context).getSingleUser(uid: widget.uid);
      BlocProvider.of<MyCallHistoryCubit>(context).getMyCallHistory(uid: uid);
 
     WidgetsBinding.instance.addObserver(this);
@@ -152,7 +153,7 @@ Future<String>getuserid()async{
           return Scaffold(
             appBar: AppBar(
               title: const Text(
-                "WhatsApp",
+                "Learn",
                 style: TextStyle(
                     fontSize: 20,
                     color: greyColor,
@@ -161,11 +162,6 @@ Future<String>getuserid()async{
               actions: [
                 Row(
                   children: [
-                    const Icon(
-                      Icons.camera_alt_outlined,
-                      color: greyColor,
-                      size: 28,
-                    ),
                     const SizedBox(
                       width: 25,
                     ),
@@ -188,8 +184,8 @@ Future<String>getuserid()async{
                           value: "Settings",
                           child: GestureDetector(
                               onTap: () {
-                                // Navigator.pushNamed(
-                                    // context, PageConst.settingsPage, arguments: widget.uid);
+                                Navigator.pushNamed(
+                                    context, PageConst.settingsPage, arguments: widget.uid);
                               },
                               child: const Text('Settings')),
                         ),
@@ -229,12 +225,15 @@ Future<String>getuserid()async{
 
               ),
             ),
+            
+            
             floatingActionButton: switchFloatingActionButtonOnTabIndex(
                 _currentTabIndex, currentUser),
+                
             body: TabBarView(
               controller: _tabController,
-
               children: [
+                
                 ChatPage(uid: uid),
                 StatusPage(currentUser: currentUser),
                 CallHistoryPage(currentUser: currentUser,),
@@ -259,7 +258,7 @@ Future<String>getuserid()async{
           return FloatingActionButton(
             backgroundColor: tabColor,
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const ContactsPage()));
+              Navigator.push(context, MaterialPageRoute(builder: (context) =>  ContactsPage(uid: uid,)));
               Navigator.pushNamed(context, PageConst.contactUsersPage, arguments: uid);
             },
             child: const Icon(
@@ -285,7 +284,7 @@ Future<String>getuserid()async{
                         return ShowMultiImageAndVideoPickedWidget(
                           selectedFiles: _selectedMedia!,
                           onTap: () {
-                            // _uploadImageStatus(currentUser);
+                            //_uploadImageStatus(currentUser);
                             Navigator.pop(context);
                           },
                         );

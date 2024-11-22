@@ -60,7 +60,7 @@ Future<void> chatInjectionContainer() async {
           () => ChatRepositoryImpl(remoteDataSource: sl.call()));
 
   sl.registerLazySingleton<ChatRemoteDataSource>(() => ChatRemoteDataSourceImpl(
-     baseUrl: Config.BaseUrl 
+     baseUrl: Config.BaseUrl, updateUserUseCase: sl.call()
   ));
 
 }

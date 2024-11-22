@@ -23,7 +23,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   TextEditingController _aboutController = TextEditingController();
 
   File? _image;
-  bool _isProfileUpdating = false;
+  final bool _isProfileUpdating = false;
 
  Future selectImage() async {
   try {

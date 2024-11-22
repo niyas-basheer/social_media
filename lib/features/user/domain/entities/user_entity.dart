@@ -8,6 +8,10 @@ class UserEntity extends Equatable {
   final String? uid;
   final String? status;
   final String? profileUrl;
+  final List<String>? groups;
+  final List<String>? myChats;
+  final List<String>? myStates;
+  final List<String>? communities;
 
   const UserEntity({
     this.username,
@@ -17,6 +21,10 @@ class UserEntity extends Equatable {
     this.uid,
     this.status,
     this.profileUrl,
+    this.groups,
+    this.myChats,
+    this.myStates,
+    this.communities,
   });
 
   @override
@@ -28,5 +36,9 @@ class UserEntity extends Equatable {
     uid,
     status,
     profileUrl,
+    groups,
+    myChats,
+    myStates,
+    communities,
   ];
 }

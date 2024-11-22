@@ -20,7 +20,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   void initState() {
-    BlocProvider.of<GetSingleUserCubit>(context).getSingleUser();
+    BlocProvider.of<GetSingleUserCubit>(context).getSingleUser(uid: widget.uid);
     super.initState();
   }
   @override
@@ -64,7 +64,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           children: [
                             Text(
                               "${singleUser.username}",
-                              style: const TextStyle(fontSize: 15),
+                              style: const TextStyle(fontSize: 15,color:Colors.blue),
                             ),
                             Text(
                               "${singleUser.status}",
@@ -187,7 +187,7 @@ class _SettingsPageState extends State<SettingsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("$title", style: const TextStyle(fontSize: 17),),
+                Text("$title", style: const TextStyle(fontSize: 17,color:Colors.blue),),
                 const SizedBox(height: 3,),
                 Text("$description", style: const TextStyle(color: greyColor),)
               ],

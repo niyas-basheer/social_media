@@ -9,8 +9,8 @@ class GetSingleUserUseCase {
 
   GetSingleUserUseCase({required this.repository});
 
-  Stream<UserModel> call() {
-    return repository.getSingleUser();
+  Stream<UserModel> call(uid) {
+    return repository.getSingleUser(uid);
   }
 
 }

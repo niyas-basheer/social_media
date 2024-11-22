@@ -15,7 +15,7 @@ abstract class UserRemoteDataSource {
   Future<void> createUser(UserModel user);
   Future<void> updateUser(UserModel user);
   Stream<List<UserModel>> getAllUsers();
-  Stream<UserModel> getSingleUser();
+  Stream<UserModel> getSingleUser(String uid);
 Future<OTPResponse> sendOtp(String phoneNumber);
   Future<List<ContactEntity>> getDeviceNumber();
 }

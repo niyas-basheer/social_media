@@ -62,12 +62,13 @@ Widget _buildDialogItem(Country country) {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           CountryPickerUtils.getDefaultFlagImage(country),
-          Text(" +${country.phoneCode}"),
+          Text(" +${country.phoneCode}",style:TextStyle(color: Colors.blue),),
           Expanded(
             child: Text(
               " ${country.name}",
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
+              style:TextStyle(color: Colors.blue)
             ),
           ),
           const Spacer(),
@@ -120,9 +121,9 @@ Widget _buildDialogItem(Country country) {
                     ),
                   ),
                   const Text(
-                    "WhatsApp Clone will send you an SMS message (carrier charges may apply) to verify your phone number. Enter the country code and phone number.",
+                    "we will send you an SMS message to verify your phone number. Enter the country code and phone number.",
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 15),
+                    style: TextStyle(fontSize: 15,color: Colors.blue),
                   ),
                   const SizedBox(height: 30),
                   ListTile(
@@ -142,7 +143,7 @@ Widget _buildDialogItem(Country country) {
                         height: 42,
                         alignment: Alignment.center,
                         child: Text(
-                          _selectedFilteredDialogCountry.phoneCode,
+                          _selectedFilteredDialogCountry.phoneCode,style: TextStyle(color: Colors.blue),
                         ),
                       ),
                       const SizedBox(width: 8.0),
@@ -157,9 +158,11 @@ Widget _buildDialogItem(Country country) {
                           ),
                           child: TextField(
                             controller: _phoneController,
+                            style: TextStyle(color: Colors.blue),
                             decoration: const InputDecoration(
                               hintText: "Phone Number",
                               border: InputBorder.none,
+                              hintStyle: TextStyle(color: Colors.blue)
                             ),
                           ),
                         ),

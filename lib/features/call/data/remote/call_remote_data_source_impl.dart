@@ -3,12 +3,14 @@ import 'package:http/http.dart' as http;
 import 'package:test_server_app/features/call/data/models/call_model.dart';
 import 'package:test_server_app/features/call/data/remote/call_remote_data_source.dart';
 import 'package:test_server_app/features/call/domain/entities/call_entity.dart';
+import 'package:test_server_app/features/user/data/data_sources/remote/user_remote_sharedprefs.dart';
 
 class CallRemoteDataSourceImpl implements CallRemoteDataSource {
   final String baseUrl; // The base URL of your server
   
   CallRemoteDataSourceImpl({required this.baseUrl});
-
+   SharedPrefs sharedPrefs = SharedPrefs();
+   
   @override
   Future<void> endCall(CallEntity call) async {
     final url = Uri.parse('$baseUrl/api/call/end');
@@ -27,7 +29,8 @@ class CallRemoteDataSourceImpl implements CallRemoteDataSource {
   }
 
   @override
-  Future<String> getCallChannelId(String uid) async {
+  Future<String> getCallChannelId() async {
+    String? uid = await sharedPrefs.getUid();
     final url = Uri.parse('$baseUrl/api/call/channel/$uid');
     final response = await http.get(url);
 
@@ -40,8 +43,9 @@ class CallRemoteDataSourceImpl implements CallRemoteDataSource {
   }
 
   @override
-  Stream<List<CallEntity>> getMyCallHistory(String uid) async* {
-    final url = Uri.parse('$baseUrl/api/calls/getMyCallHistory/6730bd263c4870b0ba083760');
+  Stream<List<CallEntity>> getMyCallHistory() async* {
+     String? uid = await sharedPrefs.getUid();
+    final url = Uri.parse('http://10.0.2.2:5001/api/calls/getMyCallHistory/$uid');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -55,7 +59,7 @@ class CallRemoteDataSourceImpl implements CallRemoteDataSource {
 
   @override
   Stream<List<CallEntity>> getUserCalling(String uid) async* {
-    final url = Uri.parse('$baseUrl/api/call/ongoing/$uid');
+    final url = Uri.parse('$baseUrl/api/calls/getMyCallHistory/$uid');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {

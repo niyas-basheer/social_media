@@ -13,10 +13,10 @@ class CallRepositoryImpl implements CallRepository {
   Future<void> endCall(CallEntity call) async => remoteDataSource.endCall(call);
 
   @override
-  Future<String> getCallChannelId(String uid) async => remoteDataSource.getCallChannelId(uid);
+  Future<String> getCallChannelId() async => remoteDataSource.getCallChannelId();
 
   @override
-  Stream<List<CallEntity>> getMyCallHistory(String uid) => remoteDataSource.getMyCallHistory(uid);
+  Stream<List<CallEntity>> getMyCallHistory() => remoteDataSource.getMyCallHistory();
 
   @override
   Stream<List<CallEntity>> getUserCalling(String uid) => remoteDataSource.getUserCalling(uid);

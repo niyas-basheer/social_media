@@ -2,11 +2,15 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:test_server_app/features/app/const/agora_config_const.dart';
 import 'package:test_server_app/features/app/home/home_page.dart';
 import 'package:test_server_app/features/app/theme/style.dart';
+import 'package:test_server_app/features/user/data/models/user_model.dart';
+import 'package:test_server_app/features/user/domain/entities/user_entity.dart';
+import 'package:test_server_app/features/user/presentation/cubit/credential/credential_cubit.dart';
 
 class InitialProfileSubmitPage extends StatefulWidget {
   final String phoneNumber;
@@ -82,22 +86,16 @@ Future<String> uploadImage() async {
     try {
     
       String? imageUrl = await uploadImage();
-       final response = await http.post(
-      Uri.parse('${Config.BaseUrl}/api/users/users'), 
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'phone': widget.phoneNumber,'username':_usernameController.text,'imgURL':imageUrl}),
-    );
-     
-      if (response.statusCode == 201) {
-        toast("Profile updated successfully!");
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
-        );
-        // Proceed with next step if needed
-      } else {
-        toast("Profile update failed. Please try again.");
-      }
+      BlocProvider.of<CredentialCubit>(context).submitProfileInfo(
+          user: UserModel(
+            username: _usernameController.text,
+            phoneNumber: widget.phoneNumber,
+            status: "Hey There! I'm using WhatsApp Clone",
+            isOnline: false,
+            profileUrl: imageUrl,
+          )
+      );
+      
     } catch (e) {
       print(e.toString());
       toast("Error: $e");
@@ -111,7 +109,9 @@ Future<String> uploadImage() async {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Profile Info")),
+    
+      appBar: AppBar(automaticallyImplyLeading: false,
+        title: const Text("Profile Info")),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
         child: Column(

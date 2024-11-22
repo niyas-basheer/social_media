@@ -6,6 +6,7 @@ import 'package:test_server_app/features/status/data/remote/status_remote_data_s
 import 'package:test_server_app/features/status/domain/entities/status_entity.dart';
 import 'package:test_server_app/features/status/domain/entities/status_image_entity.dart';
 import 'package:test_server_app/features/user/data/data_sources/remote/user_remote_sharedprefs.dart';
+import 'package:uuid/uuid.dart';
 
 class StatusRemoteDataSourceImpl implements StatusRemoteDataSource {
   final String baseUrl; // The base URL of your server
@@ -16,7 +17,10 @@ class StatusRemoteDataSourceImpl implements StatusRemoteDataSource {
   @override
   Future<void> createStatus(StatusEntity status) async {
     final url = Uri.parse('$baseUrl/api/status/status');
-    final response = await http.post(
+    var uuid = Uuid();
+    
+    
+      final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(StatusModel(
@@ -26,15 +30,16 @@ class StatusRemoteDataSourceImpl implements StatusRemoteDataSource {
         createdAt: status.createdAt,
         phoneNumber: status.phoneNumber,
         username: status.username,
-        statusId: '', // Leave empty, server can generate
+        statusId: uuid.v4(),
         caption: status.caption,
         stories: status.stories,
-      ).toDocument()),
+      ).toMap()),
     );
-
     if (response.statusCode != 200) {
       throw Exception('Failed to create status');
     }
+    
+    
   }
 
   @override
@@ -48,32 +53,37 @@ class StatusRemoteDataSourceImpl implements StatusRemoteDataSource {
   }
 
   @override
-  Stream<List<StatusEntity>> getMyStatus() async* {
+Stream<List<StatusEntity>> getMyStatus() async* {
+  try {
     String? uid = await sharedPrefs.getUid();
     final url = Uri.parse('$baseUrl/api/status/status/$uid');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
       final List<dynamic> statusJson = jsonDecode(response.body);
-      final statusList = statusJson.map((json) => StatusModel.fromSnapshot(json)).toList();
+
+      final statusList = statusJson
+          .where((doc) => doc['uid'] == uid &&
+              DateTime.parse(doc['createdAt']).isAfter(
+                DateTime.now().subtract(const Duration(hours: 24)),
+              ))
+          .map((e) => StatusModel.fromJson(e))
+          .toList();
+
       yield statusList;
+    } else if (response.statusCode == 404) {
+      yield [];
     } else {
       throw Exception('Failed to load statuses');
     }
+  } catch (e) {
+    throw Exception('Error while fetching statuses: $e');
   }
+}
 
   @override
   Future<List<StatusEntity>> getMyStatusFuture() async {
-    String? uid = await sharedPrefs.getUid();
-    final url = Uri.parse('$baseUrl/api/status/status/$uid');
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      final List<dynamic> statusJson = jsonDecode(response.body);
-      return statusJson.map((json) => StatusModel.fromSnapshot(json)).toList();
-    } else {
-      throw Exception('Failed to load statuses');
-    }
+    return  getMyStatus().first;
   }
 
   @override
@@ -83,7 +93,7 @@ class StatusRemoteDataSourceImpl implements StatusRemoteDataSource {
 
     if (response.statusCode == 200) {
       final List<dynamic> statusJson = jsonDecode(response.body);
-      final statusList = statusJson.map((json) => StatusModel.fromSnapshot(json)).toList();
+      final statusList = statusJson.map((json) => StatusModel.fromMap(json)).toList();
       yield statusList;
     } else {
       throw Exception('Failed to load statuses');

@@ -17,7 +17,7 @@ class AgoraCubit extends Cubit<AgoraState> {
   Future<void> initialize({String? token, required String channelName, required String tokenUrl}) async {
     _engine = createAgoraRtcEngine();
     await _engine.initialize(
-      RtcEngineContext(appId: Config.agoraAppId),
+      const RtcEngineContext(appId: Config.agoraAppId),
     );
 
     _engine.registerEventHandler(

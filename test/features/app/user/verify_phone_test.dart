@@ -1,6 +1,5 @@
 // credential_cubit_test.dart
 
-import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
@@ -10,7 +9,7 @@ import 'package:test_server_app/features/user/data/data_sources/remote/user_remo
 import 'package:test_server_app/features/user/data/data_sources/remote/user_remote_data_source_impl.dart';
 import 'package:test_server_app/features/user/data/data_sources/remote/user_remote_sharedprefs.dart';
 import 'package:test_server_app/features/user/data/models/user_model.dart';
-import 'package:test_server_app/features/user/presentation/cubit/credential/credential_cubit.dart'; // Adjust based on actual file path
+// Adjust based on actual file path
  
 
 // Mock classes

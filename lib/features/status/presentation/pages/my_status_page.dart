@@ -71,7 +71,7 @@ class _MyStatusPageState extends State<MyStatusPage> {
                           );
 
 
-                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomePage()));
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) =>  HomePage(uid:widget.status.uid! ,index: 1,)));
                         });
                       },
                       child: const Text('Delete'),),),

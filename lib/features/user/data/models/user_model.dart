@@ -13,6 +13,7 @@ class UserModel extends UserEntity {
   final String? status;
   @override
   final String? profileUrl;
+  @override
 
   const UserModel({
     this.username,
@@ -22,13 +23,13 @@ class UserModel extends UserEntity {
     this.status,
     this.profileUrl,
   }) : super(
-    username: username,
-    uid: uid,
-    profileUrl: profileUrl,
-    phoneNumber: phoneNumber,
-    isOnline: isOnline,
-    status: status
-  );
+          username: username,
+          phoneNumber: phoneNumber,
+          isOnline: isOnline,
+          uid: uid,
+          status: status,
+          profileUrl: profileUrl,
+        );
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
@@ -38,17 +39,19 @@ class UserModel extends UserEntity {
       uid: json['_id'],
       status: json['status'],
       profileUrl: json['profileUrl'],
+      
     );
   }
 
   Map<String, dynamic> toJson() => {
-    'username': username,
-    'phoneNumber': phoneNumber,
-    'isOnline': isOnline,
-    'uid': uid,
-    'status': status,
-    'profileUrl': profileUrl,
-  };
+        'username': username,
+        'phoneNumber': phoneNumber,
+        'isOnline': isOnline,
+        'uid': uid,
+        'status': status,
+        'profileUrl': profileUrl,
+        
+      };
 
   @override
   String toString() {
@@ -58,7 +61,8 @@ class UserModel extends UserEntity {
         'isOnline: $isOnline, '
         'uid: $uid, '
         'status: $status, '
-        'profileUrl: $profileUrl'
+        'profileUrl: $profileUrl, '
+        
         '}';
   }
 
@@ -72,7 +76,7 @@ class UserModel extends UserEntity {
           isOnline == other.isOnline &&
           uid == other.uid &&
           status == other.status &&
-          profileUrl == other.profileUrl;
+          profileUrl == other.profileUrl ;
 
   @override
   int get hashCode =>
@@ -81,5 +85,6 @@ class UserModel extends UserEntity {
       isOnline.hashCode ^
       uid.hashCode ^
       status.hashCode ^
-      profileUrl.hashCode;
+      profileUrl.hashCode ;
+      
 }

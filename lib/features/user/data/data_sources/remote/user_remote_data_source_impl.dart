@@ -33,11 +33,11 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
   }
 
   @override
-   Stream<List<UserModel>> getAllUsers() async* {
+   Stream<List<UserModel>> getAllUsers()async*  {
   final url = Uri.parse('$baseUrl/api/users/users');
+    
   final response = await http.get(url);
-
-  if (response.statusCode == 200) {
+ 
     // Decode the response body as a Map
     final Map<String, dynamic> responseData = jsonDecode(response.body);
 
@@ -48,22 +48,24 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
     final users = usersJson.map((json) => UserModel.fromJson(json)).toList();
 
     // Yield the list of users
-    yield users;
-  } else {
-    
-  }
+    yield (usersJson)
+          .map((user) => UserModel.fromJson(user))
+          .toList();
+  
+  
+  
+ 
+  
 }
 
   @override
   Future<String> getCurrentUID() async {
     
-    String? uid = await sharedPrefs.getUid();
-    if (uid!=null) {
-      return uid;
-    }else{
-      toast('no user id found');
-    }
-    return '';
+    String? token = await sharedPrefs.getUid();
+    if (token == null) {
+      throw ServerException('Failed to get current user id');
+      }
+      return token;
   }
 
   @override
@@ -89,18 +91,19 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
   }
 
   @override
-  Stream<UserModel> getSingleUser() async* {
-    String uid = await getCurrentUID();
+  Stream<UserModel>getSingleUser(String uid)async*  {
+    print('hhhhhhhh');
     final url = Uri.parse('$baseUrl/api/users/users/$uid');
+    
+   
     final response = await http.get(url);
 
-    if (response.statusCode == 200) {
-      final userJson = jsonDecode(response.body);
-      final user = UserModel.fromJson(userJson);
-      yield user;
-    } else {
-      toast('Failed to load user');
-    }
+      final Map<String, dynamic>responseData = jsonDecode(response.body);
+      final usersJson = UserModel.fromJson(responseData['data']);
+      yield usersJson;
+     
+    
+    
   }
 
   @override
@@ -184,6 +187,7 @@ Future<String> verifyPhoneNumber(String phoneNumber, String otp) async {
     
     final sharedPrefService = SharedPrefs(); 
     bool isSignedIn = await sharedPrefService.getSignInStatus();
+    print(isSignedIn);
     return isSignedIn;
     
   }

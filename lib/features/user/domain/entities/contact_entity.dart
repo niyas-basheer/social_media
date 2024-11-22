@@ -12,11 +12,7 @@ class ContactEntity {
   final List<Address>? addresses;
   final List<Organization>? organizations;
   final List<Website>? websites;
-  final List<SocialMedia>? socialMedias;
-  final List<Event>? events;
-  final List<Note>? notes;
-  final List<Group>? groups;
-
+ 
   ContactEntity(
       {this.id,
         this.displayName,
@@ -28,8 +24,5 @@ class ContactEntity {
         this.addresses,
         this.organizations,
         this.websites,
-        this.socialMedias,
-        this.events,
-        this.notes,
-        this.groups});
+      });
 }

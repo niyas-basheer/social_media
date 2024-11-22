@@ -23,7 +23,7 @@ class _PickUpCallPageState extends State<PickUpCallPage> {
 
   @override
   void initState() {
-    BlocProvider.of<CallCubit>(context).getUserCalling(widget.uid!);
+    BlocProvider.of<CallCubit>(context).getUserCalling("67372c62ff0eb19eca30fe84");
     super.initState();
   }
 

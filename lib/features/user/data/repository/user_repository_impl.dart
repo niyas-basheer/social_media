@@ -25,7 +25,7 @@ class UserRepositoryImpl implements UserRepository {
   Future<List<ContactEntity>> getDeviceNumber() async => remoteDataSource.getDeviceNumber();
 
   @override
-  Stream<UserModel> getSingleUser() => remoteDataSource.getSingleUser();
+  Stream<UserModel> getSingleUser(String uid) => remoteDataSource.getSingleUser(uid);
   @override
   Future<bool> isSignIn() async => remoteDataSource.isSignIn();
   @override

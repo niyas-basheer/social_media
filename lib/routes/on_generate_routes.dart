@@ -24,7 +24,7 @@ class OnGenerateRoute {
       case PageConst.contactUsersPage:
         {
           if(args is String) {
-            return materialPageBuilder(ContactsPage());
+            return materialPageBuilder(ContactsPage(uid: args,));
 
           } else {
             return materialPageBuilder( const ErrorPage());

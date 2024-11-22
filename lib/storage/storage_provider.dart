@@ -1,95 +1,76 @@
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'dart:io';
-import 'package:http_parser/http_parser.dart';
 
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 
 class StorageProviderRemoteDataSource {
-  final String baseUrl; // The base URL of your server
+  static final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  StorageProviderRemoteDataSource({required this.baseUrl});
-
-  Future<String> uploadProfileImage({required File file, Function(bool isUploading)? onComplete}) async {
+  static Future<String> uploadProfileImage(
+      {required File file, Function(bool isUploading)? onComplete}) async {
     onComplete!(true);
 
-    final url = Uri.parse('$baseUrl/api/upload/profile');
-    final request = http.MultipartRequest('POST', url)
-      ..files.add(await http.MultipartFile.fromPath('file', file.path, contentType: MediaType('image', 'png')));
+    final ref = _storage.ref().child(
+        "profile/${DateTime.now().millisecondsSinceEpoch}");
 
-    final response = await request.send();
+    final uploadTask = ref.putData(await file.readAsBytes(),  SettableMetadata(contentType: 'image/png'),);
 
-    if (response.statusCode == 200) {
-      final responseData = await response.stream.bytesToString();
-      final Map<String, dynamic> data = jsonDecode(responseData);
-      onComplete(false);
-      return data['imageUrl'];
-    } else {
-      onComplete(false);
-      throw Exception('Failed to upload profile image');
-    }
+
+    final imageUrl =
+    (await uploadTask.whenComplete(() {})).ref.getDownloadURL();
+    onComplete(false);
+    return await imageUrl;
   }
 
-  Future<String> uploadStatus({required File file, Function(bool isUploading)? onComplete}) async {
+  static Future<String> uploadStatus(
+      {required File file, Function(bool isUploading)? onComplete}) async {
     onComplete!(true);
 
-    final url = Uri.parse('$baseUrl/api/upload/status');
-    final request = http.MultipartRequest('POST', url)
-      ..files.add(await http.MultipartFile.fromPath('file', file.path, contentType: MediaType('image', 'png')));
+    final ref = _storage.ref().child(
+        "status/${DateTime.now().millisecondsSinceEpoch}");
 
-    final response = await request.send();
+    final uploadTask = ref.putData(await file.readAsBytes(),  SettableMetadata(contentType: 'image/png'),);
 
-    if (response.statusCode == 200) {
-      final responseData = await response.stream.bytesToString();
-      final Map<String, dynamic> data = jsonDecode(responseData);
-      onComplete(false);
-      return data['imageUrl'];
-    } else {
-      onComplete(false);
-      throw Exception('Failed to upload status');
-    }
+    final imageUrl =
+    (await uploadTask.whenComplete(() {})).ref.getDownloadURL();
+    onComplete(false);
+    return await imageUrl;
   }
 
-  Future<List<String>> uploadStatuses({required List<File> files, Function(bool isUploading)? onComplete}) async {
+  static Future<List<String>> uploadStatuses(
+      {required List<File> files, Function(bool isUploading)? onComplete}) async {
     onComplete!(true);
 
     List<String> imageUrls = [];
     for (var i = 0; i < files.length; i++) {
-      final url = Uri.parse('$baseUrl/api/upload/status');
-      final request = http.MultipartRequest('POST', url)
-        ..files.add(await http.MultipartFile.fromPath('file', files[i].path, contentType: MediaType('image', 'png')));
+      final ref = _storage.ref().child(
+          "status/${DateTime.now().millisecondsSinceEpoch}${i + 1}");
 
-      final response = await request.send();
+      final uploadTask = ref.putData(await files[i].readAsBytes(), SettableMetadata(contentType: 'image/png'));
 
-      if (response.statusCode == 200) {
-        final responseData = await response.stream.bytesToString();
-        final Map<String, dynamic> data = jsonDecode(responseData);
-        imageUrls.add(data['imageUrl']);
-      } else {
-        onComplete(false);
-        throw Exception('Failed to upload status');
-      }
+      final imageUrl =
+      (await uploadTask.whenComplete(() {})).ref.getDownloadURL();
+      imageUrls.add(await imageUrl);
     }
     onComplete(false);
     return imageUrls;
   }
 
-  Future<String> uploadMessageFile({required File file, Function(bool isUploading)? onComplete, String? uid, String? otherUid, String? type}) async {
+  static Future<String> uploadMessageFile(
+      {required File file, Function(bool isUploading)? onComplete, String? uid, String? otherUid,String? type}) async {
     onComplete!(true);
 
-    final url = Uri.parse('$baseUrl/api/upload/message/$type/$uid/$otherUid');
-    final request = http.MultipartRequest('POST', url)
-      ..files.add(await http.MultipartFile.fromPath('file', file.path, contentType: MediaType('image', 'png')));
+    final ref = _storage.ref().child(
+        "message/$type/$uid/$otherUid/${DateTime.now().millisecondsSinceEpoch}");
 
-    final response = await request.send();
+    final uploadTask = ref.putData(await file.readAsBytes(),  SettableMetadata(contentType: 'image/png'),);
 
-    if (response.statusCode == 200) {
-      final responseData = await response.stream.bytesToString();
-      final Map<String, dynamic> data = jsonDecode(responseData);
-      onComplete(false);
-      return data['imageUrl'];
-    } else {
-      onComplete(false);
-      throw Exception('Failed to upload message file');
-    }
+    final imageUrl =
+    (await uploadTask.whenComplete(() {})).ref.getDownloadURL();
+    onComplete(false);
+    return await imageUrl;
   }
+
 }
+
+

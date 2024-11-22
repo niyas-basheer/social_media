@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_story_view/flutter_story_view.dart';
 import 'package:flutter_story_view/models/story_item.dart';
 import 'package:path/path.dart' as path;
-import 'package:test_server_app/features/user/data/data_sources/remote/user_remote_sharedprefs.dart';
 import 'package:test_server_app/main_injection_container.dart' as di;
 import 'package:test_server_app/features/app/const/page_const.dart';
 import 'package:test_server_app/features/app/global/date/date_formats.dart';
@@ -37,7 +36,7 @@ class _StatusPageState extends State<StatusPage> {
   List<StoryItem> myStories = [];
 
   List<File>? _selectedMedia;
-  List<String>? _mediaTypes; 
+  List<String>? _mediaTypes; // To store the type of each selected file
 
   Future<void> selectMedia() async {
     setState(() {
@@ -78,14 +77,7 @@ class _StatusPageState extends State<StatusPage> {
       print("Error while picking file: $e");
     }
   }
-String uid='';
-  SharedPrefs sharedPrefs = SharedPrefs();
-Future<String>getuserid()async{
 
-     uid =  await sharedPrefs.getUid()??'';
-  
-    return uid;
-  }
   @override
   void initState() {
     super.initState();
@@ -93,7 +85,7 @@ Future<String>getuserid()async{
     BlocProvider.of<StatusCubit>(context).getStatuses(status: const StatusEntity());
 
     BlocProvider.of<GetMyStatusCubit>(context).getMyStatus(
-        uid: uid);
+        uid: widget.currentUser.uid!);
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       di.sl<GetMyStatusFutureUseCase>()
@@ -125,20 +117,15 @@ Future<String>getuserid()async{
 
   @override
   Widget build(BuildContext context) {
-    print("build");
     return  BlocBuilder<StatusCubit, StatusState>(
       builder: (context, state) {
         if (state is StatusLoaded) {
           final statuses = state.statuses.where((element) => element.uid != widget.currentUser.uid).toList();
-          print("statuses loaded $statuses");
-
           return BlocBuilder<GetMyStatusCubit, GetMyStatusState>(
             builder: (context, state) {
               if(state is GetMyStatusLoaded) {
-                print("loaded my status ${state.myStatus}");
                 return _bodyWidget(statuses, widget.currentUser, myStatus: state.myStatus);
               }
-
               return const Center(
                 child: CircularProgressIndicator(
                   color: tabColor,
@@ -343,7 +330,6 @@ Future<String>getuserid()async{
 
   Future _showStatusImageViewBottomModalSheet({StatusEntity? status, required List<StoryItem> stories}) async {
 
-    print("storieas $stories");
     showModalBottomSheet(
       isScrollControlled: true,
       isDismissible: false,
@@ -368,48 +354,61 @@ Future<String>getuserid()async{
   }
 
   _uploadImageStatus(UserEntity currentUser) {
-  StorageProviderRemoteDataSource(baseUrl: 'your_base_url').uploadStatuses(
-    files: _selectedMedia!,
-    onComplete: (onCompleteStatusUpload) {},
-  ).then((statusImageUrls) {
-    for (var i = 0; i < statusImageUrls.length; i++) {
-      _stories.add(StatusImageEntity(
-        url: statusImageUrls[i],
-        type: _mediaTypes![i],
-        viewers: const [],
-      ));
-    }
-
-    di.sl<GetMyStatusFutureUseCase>().call().then((myStatus) {
-      if (myStatus.isNotEmpty) {
-        BlocProvider.of<StatusCubit>(context)
-            .updateOnlyImageStatus(status: StatusEntity(statusId: myStatus.first.statusId, stories: _stories))
-            .then((value) {
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const HomePage()));
-        });
-      } else {
-        BlocProvider.of<StatusCubit>(context).createStatus(
-          status: StatusEntity(
-              caption: "",
-              createdAt: DateTime.now(),
-              stories: _stories,
-              username: currentUser.username,
-              uid: currentUser.uid,
-              profileUrl: currentUser.profileUrl,
-              imageUrl: statusImageUrls[0],
-              phoneNumber: currentUser.phoneNumber),
-        ).then((value) {
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const HomePage()));
-        });
+    StorageProviderRemoteDataSource.uploadStatuses(
+        files: _selectedMedia!,
+        onComplete: (onCompleteStatusUpload) {})
+        .then((statusImageUrls) {
+      for (var i = 0; i < statusImageUrls.length; i++) {
+        _stories.add(StatusImageEntity(
+          url: statusImageUrls[i],
+          type: _mediaTypes![i],
+          viewers: const [],
+        ));
       }
-    });
-  });
-}
 
+      di.sl<GetMyStatusFutureUseCase>().call().then((myStatus) {
+       
+        List<StatusEntity> myemty=[];
+        if (myStatus.length != myemty.length) {
+          
+          BlocProvider.of<StatusCubit>(context)
+              .updateOnlyImageStatus(status: StatusEntity(statusId: myStatus.first.statusId, stories: _stories))
+              .then((value) {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => HomePage(
+                      uid: widget.currentUser.uid!,
+                      index: 1,
+                    )));
+          });
+        } else {
+           print("my list :$myStatus");
+          BlocProvider.of<StatusCubit>(context)
+              .createStatus(
+            status: StatusEntity(
+                caption: "",
+                createdAt: DateTime.now(),
+                stories: _stories,
+                username: currentUser.username,
+                uid: currentUser.uid,
+                profileUrl: currentUser.profileUrl,
+                imageUrl: statusImageUrls[0],
+                phoneNumber: currentUser.phoneNumber),
+          )
+              .then((value) {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => HomePage(
+                      uid: widget.currentUser.uid!,
+                      index: 1,
+                    )));
+          });
+        }
+      });
+    });
+  }
 
 
   void _eitherShowOrUploadSheet(StatusEntity? myStatus, UserEntity currentUser) {

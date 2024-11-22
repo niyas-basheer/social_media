@@ -47,7 +47,8 @@ sl.registerFactory<GetSingleUserCubit>(() => GetSingleUserCubit(
       getDeviceNumberUseCase: sl.call()
   ));
    sl.registerFactory<CredentialCubit>(() => CredentialCubit(
-     verifyPhoneNumberUseCase:sl.call()
+     verifyPhoneNumberUseCase:sl.call(),
+      createUserUseCase: sl.call(),
   ));
 
   // * USE CASES INJECTION

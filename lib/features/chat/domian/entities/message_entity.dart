@@ -11,6 +11,8 @@ class MessageEntity extends Equatable {
   final String? message;
   final DateTime? createdAt;
   final bool? isSeen;
+  final String? fileUrl;
+  final String? fileName;
   final String? repliedTo;
   final String? repliedMessage;
   final String? repliedMessageType;
@@ -29,6 +31,8 @@ class MessageEntity extends Equatable {
         this.message,
         this.createdAt,
         this.isSeen,
+         this.fileUrl,
+    this.fileName,
         this.repliedTo,
         this.repliedMessage,
         this.repliedMessageType,

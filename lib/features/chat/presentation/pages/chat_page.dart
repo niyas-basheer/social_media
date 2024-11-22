@@ -7,6 +7,7 @@ import 'package:test_server_app/features/app/theme/style.dart';
 import 'package:test_server_app/features/chat/domian/entities/chat_entity.dart';
 import 'package:test_server_app/features/chat/domian/entities/message_entity.dart';
 import 'package:test_server_app/features/chat/presentation/cubit/chat/chat_cubit.dart';
+import 'package:test_server_app/features/user/data/data_sources/remote/user_remote_sharedprefs.dart';
 
 
 class ChatPage extends StatefulWidget {
@@ -21,9 +22,11 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   void initState() {
-    BlocProvider.of<ChatCubit>(context).getMyChat(chat: ChatEntity(senderUid: widget.uid));
+    
+    BlocProvider.of<ChatCubit>(context).getMyChat(chat: ChatEntity(senderUid: widget.uid,participants: [],type: '',));
     super.initState();
   }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,7 +37,7 @@ class _ChatPageState extends State<ChatPage> {
 
               if(myChat.isEmpty) {
                 return const Center(
-                  child: Text("No Conversation Yet"),
+                  child: Text("No Conversation Yet",style: TextStyle(color:Colors.blue)),
                 );
               }
 

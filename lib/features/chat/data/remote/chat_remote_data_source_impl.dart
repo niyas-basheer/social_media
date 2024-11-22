@@ -4,14 +4,15 @@ import 'package:test_server_app/features/chat/data/models/message_model.dart';
 import 'package:test_server_app/features/chat/data/remote/chat_remote_data_source.dart';
 import 'package:test_server_app/features/chat/domian/entities/chat_entity.dart';
 import 'package:test_server_app/features/chat/domian/entities/message_entity.dart';
+import 'package:test_server_app/features/user/domain/usecases/user/update_user_usecase.dart';
 import 'dart:convert';
 import 'package:uuid/uuid.dart';
 
 class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   final String baseUrl;
-
-  ChatRemoteDataSourceImpl({required this.baseUrl});
-
+  final UpdateUserUseCase updateUserUseCase;
+  ChatRemoteDataSourceImpl({required this.baseUrl,required this.updateUserUseCase});
+   
   @override
   Future<void> sendMessage(ChatEntity chat, MessageEntity message) async {
     await sendMessageBasedOnType(message);
@@ -36,6 +37,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     }
 
     await addToChat(ChatEntity(
+       participants:[chat.recipientUid!,chat.senderUid!] ,
       createdAt: chat.createdAt,
       senderProfile: chat.senderProfile,
       recipientProfile: chat.recipientProfile,
@@ -44,7 +46,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
       senderName: chat.senderName,
       recipientUid: chat.recipientUid,
       senderUid: chat.senderUid,
-      totalUnReadMessages: chat.totalUnReadMessages,
+      totalUnReadMessages: chat.totalUnReadMessages,type: chat.type
     ));
   }
 
@@ -54,6 +56,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
       url,
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(ChatModel(
+        participants:[chat.recipientUid!,chat.senderUid!] ,
         createdAt: chat.createdAt,
         senderProfile: chat.senderProfile,
         recipientProfile: chat.recipientProfile,
@@ -62,8 +65,8 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
         senderName: chat.senderName,
         recipientUid: chat.recipientUid,
         senderUid: chat.senderUid,
-        totalUnReadMessages: chat.totalUnReadMessages,
-      ).toDocument()),
+        totalUnReadMessages: chat.totalUnReadMessages, type: chat.type,
+      ).toJson()),
     );
 
     if (response.statusCode != 200) {
@@ -131,7 +134,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
 
   @override
   Stream<List<MessageEntity>> getMessages(MessageEntity message) async* {
-    final url = Uri.parse('$baseUrl/api/chat/messages/${message.senderUid}/${message.recipientUid}');
+    final url = Uri.parse('$baseUrl/api/chat/messages/${message.senderUid}/6737299fff0eb19eca30fe67');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -145,9 +148,10 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
 
   @override
   Stream<List<ChatEntity>> getMyChat(ChatEntity chat) async* {
-    final url = Uri.parse('$baseUrl/api/chat/get/${chat.senderUid}');
+    print("this re${chat.recipientUid},this sender${chat.senderUid}");
+    final url = Uri.parse('$baseUrl/api/chat/messages/${chat.senderUid}/6737299fff0eb19eca30fe67');
     final response = await http.get(url);
-
+    
     if (response.statusCode == 200) {
       final List<dynamic> chatsJson = jsonDecode(response.body);
       final chats = chatsJson.map((json) => ChatModel.fromJson(json)).toList();

@@ -101,7 +101,7 @@ class MyApp extends StatelessWidget {
             return BlocBuilder<AuthCubit, AuthState>(
               builder: (context, authState) {
                 if (authState is Authenticated) {
-                  return const HomePage();
+                  return HomePage(uid: authState.uid);
                 }
                 return const SplashScreen();
               },

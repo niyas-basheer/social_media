@@ -15,6 +15,7 @@ class ChatUtils {
     required MessageEntity messageEntity,
     String? message,
     String? type,
+    String? chattype,
     String? repliedMessage,
     String? repliedTo,
     String? repliedMessageType,
@@ -34,6 +35,7 @@ class ChatUtils {
           message: message
       ),
       chat: ChatEntity(
+        participants: [messageEntity.senderUid??'',messageEntity.recipientUid??''],
         senderUid: messageEntity.senderUid,
         recipientUid: messageEntity.recipientUid,
         senderName: messageEntity.senderName,
@@ -42,6 +44,7 @@ class ChatUtils {
         recipientProfile: messageEntity.recipientProfile,
         createdAt: DateTime.now(),
         totalUnReadMessages: 0,
+        type: chattype??"",
       ),
     );
   }

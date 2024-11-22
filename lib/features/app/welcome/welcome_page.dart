@@ -10,16 +10,18 @@ class WelcomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Container(
+        decoration: BoxDecoration(color: Colors.white),
         margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            const Center(child: Text("Welcome to WhatsApp Clone", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: tabColor),),),
-            Image.asset("assets/bg_image.png"),
+            const Center(child: Text("Welcome to Learn", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: tabColor),),),
+            Image.asset("assets/welcomepage.png"),
             Column(
               children: [
-                const Text("Read our Privacy Policy Tap, 'Agree and Continue' to accept the Team of Service.", textAlign: TextAlign.center,style: TextStyle(fontSize: 15),),
+                const Text("Read our Privacy Policy Tap, 'Agree and Continue' to accept the Team of Service.", textAlign: TextAlign.center,style: TextStyle(fontSize: 15,color: Colors.blue),),
                 const SizedBox(height: 30,),
                 GestureDetector(
                   onTap: () {
@@ -33,7 +35,7 @@ class WelcomePage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(5),
                     ),
                     child: const Center(
-                      child: Text("AGREE AND CONTINUE", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500),),
+                      child: Text("AGREE AND CONTINUE", style: TextStyle(color:  Color(0xFFFAF6E3) , fontSize: 15, fontWeight: FontWeight.w500),),
                     ),
                   ),
                 )

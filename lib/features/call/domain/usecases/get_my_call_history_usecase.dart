@@ -10,6 +10,6 @@ class GetMyCallHistoryUseCase {
   const GetMyCallHistoryUseCase({required this.repository});
 
   Stream<List<CallEntity>> call(String uid)  {
-    return repository.getMyCallHistory(uid);
+    return repository.getMyCallHistory();
   }
 }

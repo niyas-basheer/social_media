@@ -14,7 +14,7 @@ abstract class UserRepository {
   Future<void> createUser(UserModel user);
   Future<void> updateUser(UserModel user);
   Stream<List<UserEntity>> getAllUsers();
-  Stream<UserModel> getSingleUser();
+  Stream<UserModel> getSingleUser(String uid);
   Future<String> resendOtp(String phoneNumber);
   Future<List<ContactEntity>> getDeviceNumber();
 }

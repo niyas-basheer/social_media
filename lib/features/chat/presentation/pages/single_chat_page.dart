@@ -44,7 +44,7 @@ class _SingleChatPageState extends State<SingleChatPage> {
   
 
 void connect(){
-  socket =IO.io("http://192.168.1.255:5001",<String,dynamic>{
+  socket =IO.io("http://10.0.2.2:5001",<String,dynamic>{
     "transports":["websocket"],
     "autoConnect":false,
   });
@@ -87,6 +87,7 @@ void connect(){
   @override
   void dispose() {
     _textMessageController.dispose();
+     _scrollController.dispose(); 
     super.dispose();
   }
 
@@ -101,7 +102,7 @@ void connect(){
   void initState() {
     _soundRecorder = FlutterSoundRecorder();
     _openAudioRecording();
-    BlocProvider.of<GetSingleUserCubit>(context).getSingleUser();
+    BlocProvider.of<GetSingleUserCubit>(context).getSingleUser(uid: widget.message.recipientUid!);
 
     BlocProvider.of<MessageCubit>(context).getMessages(message: MessageEntity(
       senderUid: widget.message.senderUid,
@@ -111,9 +112,8 @@ void connect(){
     super.initState();
   }
 
-  Future<void> _scrollToBottom() async {
+  void _scrollToBottom() {
     if (_scrollController.hasClients) {
-      await Future.delayed(const Duration(milliseconds: 100));
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
         duration: const Duration(milliseconds: 300),
@@ -251,9 +251,7 @@ void connect(){
         body: BlocBuilder<MessageCubit, MessageState>(
           builder: (context, state) {
             if (state is MessageLoaded) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                _scrollToBottom();
-              });
+              
               final messages = state.messages;
               return GestureDetector(
                 onTap: () {
@@ -737,7 +735,16 @@ void connect(){
       ),
     );
   }
+@override
+  void didUpdateWidget(SingleChatPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Scroll to bottom after the state updates and widget rebuilds
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToBottom();
+    });
+  }
 
+ 
   _messageLayout({
     Color? messageBgColor,
     Alignment? alignment,
@@ -920,7 +927,7 @@ void connect(){
 
     if (_isRecording == true) {
       await _soundRecorder!.stopRecorder();
-      StorageProviderRemoteDataSource(baseUrl: 'your_base_url').uploadMessageFile(
+      StorageProviderRemoteDataSource.uploadMessageFile(
         file: File(audioPath),
         onComplete: (value) {},
         uid: widget.message.senderUid,
@@ -940,7 +947,7 @@ void connect(){
 }
 
 void _sendImageMessage() {
-  StorageProviderRemoteDataSource(baseUrl: 'your_base_url').uploadMessageFile(
+  StorageProviderRemoteDataSource.uploadMessageFile(
     file: _image!,
     onComplete: (value) {},
     uid: widget.message.senderUid,
@@ -952,7 +959,7 @@ void _sendImageMessage() {
 }
 
 void _sendVideoMessage() {
-  StorageProviderRemoteDataSource(baseUrl: 'your_base_url').uploadMessageFile(
+  StorageProviderRemoteDataSource.uploadMessageFile(
     file: _video!,
     onComplete: (value) {},
     uid: widget.message.senderUid,
@@ -971,8 +978,13 @@ Future _sendGifMessage() async {
   }
 }
 
-void _sendMessage({required String message, required String type, String? repliedMessage, String? repliedTo, String? repliedMessageType}) {
-  _scrollToBottom();
+void _sendMessage({
+  required String message, 
+required String type,
+ String? repliedMessage,
+  String? repliedTo, 
+  String? repliedMessageType}) {
+  
 
   ChatUtils.sendMessage(context,
     messageEntity: widget.message,
@@ -981,9 +993,7 @@ void _sendMessage({required String message, required String type, String? replie
     repliedTo: repliedTo,
     repliedMessageType: repliedMessageType,
     repliedMessage: repliedMessage,
-  ).then((value) {
-    _scrollToBottom();
-  });
+  );
 }
 
 
