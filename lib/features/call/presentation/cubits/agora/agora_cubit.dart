@@ -23,13 +23,10 @@ class AgoraCubit extends Cubit<AgoraState> {
     _engine.registerEventHandler(
       RtcEngineEventHandler(
         onJoinChannelSuccess: (RtcConnection connection, int elapsed) {
-          print('Local user ${connection.localUid} joined channel ${connection.channelId}');
         },
         onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
-          print('Remote user $remoteUid joined');
         },
         onUserOffline: (RtcConnection connection, int remoteUid, UserOfflineReasonType reason) {
-          print('Remote user $remoteUid left the channel');
         },
       ),
     );

@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_server_app/features/user/data/models/user_model.dart';
-import 'package:test_server_app/features/user/domain/entities/user_entity.dart';
 import 'package:test_server_app/features/user/domain/usecases/credential/verify_phone_number_usecsae.dart';
 import 'package:test_server_app/features/user/domain/usecases/user/create_user_usecase.dart';
 import 'package:test_server_app/features/user/presentation/cubit/credential/credential_state.dart';

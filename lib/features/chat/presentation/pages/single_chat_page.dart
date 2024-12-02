@@ -46,11 +46,11 @@ class _SingleChatPageState extends State<SingleChatPage> {
 void connect(){
   socket =IO.io("http://10.0.2.2:5001",<String,dynamic>{
     "transports":["websocket"],
-    "autoConnect":false,
+    "autoConnect":true,
   });
   socket.connect();
-  socket.on('connect', (_){
-    print('connect');
+  socket.on('connection', (_){
+    print('connected');
     });
 }
 
@@ -103,7 +103,7 @@ void connect(){
     _soundRecorder = FlutterSoundRecorder();
     _openAudioRecording();
     BlocProvider.of<GetSingleUserCubit>(context).getSingleUser(uid: widget.message.recipientUid!);
-
+    
     BlocProvider.of<MessageCubit>(context).getMessages(message: MessageEntity(
       senderUid: widget.message.senderUid,
       recipientUid: widget.message.recipientUid
@@ -140,7 +140,6 @@ void connect(){
       if (pickedFile != null) {
         _image = File(pickedFile.path);
       } else {
-        print("No image has been selected");
       }
     });
   } catch (e) {
@@ -160,7 +159,6 @@ void connect(){
       if (pickedFile != null) {
         _video = File(pickedFile.path);
       } else {
-        print("No video has been selected");
       }
     });
   } catch (e) {
@@ -276,9 +274,10 @@ void connect(){
                             itemCount: messages.length,
                             itemBuilder: (context, index) {
                               final message= messages[index];
-
+                               print(message.uid);
                               if(message.isSeen == false  && message.recipientUid == widget.message.uid) {
                                 provider.seenMessage(message: MessageEntity(
+                                     uid: message.uid,
                                     senderUid: widget.message.senderUid,
                                     recipientUid: widget.message.recipientUid,
                                     messageId: message.messageId
@@ -738,7 +737,6 @@ void connect(){
 @override
   void didUpdateWidget(SingleChatPage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Scroll to bottom after the state updates and widget rebuilds
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToBottom();
     });

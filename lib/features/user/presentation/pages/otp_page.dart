@@ -160,7 +160,7 @@ class _OtpPageState extends State<OtpPage> {
       child: PinCodeFields(
         controller: _otpController,
         length: 6,
-        textStyle: TextStyle(color: Colors.blue),
+        textStyle: const TextStyle(color: Colors.blue),
         activeBorderColor: Colors.blue,
         onComplete: (String pinCode) {},
       ),

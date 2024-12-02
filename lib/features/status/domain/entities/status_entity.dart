@@ -5,7 +5,7 @@ import 'package:test_server_app/features/status/domain/entities/status_image_ent
 class StatusEntity extends Equatable {
   final String? statusId;
   final String? imageUrl;
-  final String? uid;
+  final String? useruid;
   final String? username;
   final String? profileUrl;
   final DateTime? createdAt;
@@ -17,7 +17,7 @@ class StatusEntity extends Equatable {
       {
         this.statusId,
       this.imageUrl,
-      this.uid,
+      this.useruid,
       this.username,
       this.profileUrl,
       this.createdAt,
@@ -30,7 +30,7 @@ class StatusEntity extends Equatable {
   List<Object?> get props => [
     statusId,
     imageUrl,
-    uid,
+    useruid,
     username,
     profileUrl,
     createdAt,

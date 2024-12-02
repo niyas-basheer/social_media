@@ -18,7 +18,6 @@ class LoginCubit extends Cubit<LoginState> {
         emit(LoginFailure("Failed to send OTP"));
       }
     } catch (e) {
-      print(e.toString());
       emit(LoginFailure(e.toString()));
     }
   }

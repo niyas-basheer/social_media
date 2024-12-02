@@ -8,5 +8,5 @@ class MessageTypeConst {
   static const String photoMessage = "photoMessage";
   static const String audioMessage = "audioMessage";
   static const String videoMessage = "videoMessage";
-  static const String gifMessage = "gifMessage";
+  static const String gifMessage =   "gifMessage";
 }

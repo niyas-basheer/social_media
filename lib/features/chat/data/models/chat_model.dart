@@ -1,13 +1,11 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:convert';
 
 import 'package:test_server_app/features/chat/domian/entities/chat_entity.dart';
 
 class ChatModel extends ChatEntity {
   @override
-  final List<String> participants; 
+  final String id;
   @override
-  final String type;
+  final List<String> participants; 
   @override 
   final String? senderUid; 
   @override
@@ -36,10 +34,11 @@ class ChatModel extends ChatEntity {
   final List<String>? groupAdmins; 
   @override
   final List<String>? messages;
+   
 
   const ChatModel({
+    required this.id,
      required this.participants,
-    required this.type,
     this.senderUid,
     this.recipientUid,
     this.senderName,
@@ -55,8 +54,8 @@ class ChatModel extends ChatEntity {
     this.groupAdmins,
     this.messages,
   }) : super(
+    id: id,
     participants:participants,
-    type:type,
     senderUid:senderUid,
     recipientUid:recipientUid,
     senderName:senderName,
@@ -79,14 +78,14 @@ class ChatModel extends ChatEntity {
   
  factory ChatModel.fromJson(Map<String, dynamic> json) {
     return ChatModel(
+      id: json['_id'],
       participants: json['participants'].cast<String>(),
-      type: json['type'],
       senderUid: json['senderUid'],
       recipientUid: json['recipientUid'],
       senderName: json['senderName'],
       recipientName: json['recipientName'],
       recentTextMessage: json['recentTextMessage'],
-      createdAt: DateTime.parse(json['createdAt']),
+      createdAt: DateTime.parse(json['updatedAt']).toLocal(),
       senderProfile: json['senderProfile'],
       recipientProfile: json['recipientProfile'],
       totalUnReadMessages: json['totalUnReadMessages'],
@@ -94,14 +93,14 @@ class ChatModel extends ChatEntity {
       groupDescription: json['groupDescription'],
       groupIcon: json['groupIcon'],
       groupAdmins: json['groupAdmins']?.cast<String>(),
-      messages: json['messages']?.cast<String>(),
+      messages: List<String>.from(json['messages']?.map((e) => e.toString()) ?? []),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
+      '_id': id,
       'participants': participants,
-      'type': type,
       'senderUid': senderUid,
       'recipientUid': recipientUid,
       'senderName': senderName,

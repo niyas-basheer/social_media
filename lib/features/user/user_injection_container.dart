@@ -87,7 +87,7 @@ sl.registerFactory<GetSingleUserCubit>(() => GetSingleUserCubit(
           () => UserRepositoryImpl(remoteDataSource: sl.call()));
 
   sl.registerLazySingleton<UserRemoteDataSource>(() => UserRemoteDataSourceImpl(
-     baseUrl: Config.BaseUrl 
+     baseUrl: Config.baseUrl 
   ));
 
 }

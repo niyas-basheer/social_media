@@ -36,7 +36,7 @@ class _StatusPageState extends State<StatusPage> {
   List<StoryItem> myStories = [];
 
   List<File>? _selectedMedia;
-  List<String>? _mediaTypes; // To store the type of each selected file
+  List<String>? _mediaTypes; 
 
   Future<void> selectMedia() async {
     setState(() {
@@ -51,11 +51,7 @@ class _StatusPageState extends State<StatusPage> {
       );
       if (result != null) {
         _selectedMedia = result.files.map((file) => File(file.path!)).toList();
-
-        // Initialize the media types list
         _mediaTypes = List<String>.filled(_selectedMedia!.length, '');
-
-        // Determine the type of each selected file
         for (int i = 0; i < _selectedMedia!.length; i++) {
           String extension = path.extension(_selectedMedia![i].path)
               .toLowerCase();
@@ -69,12 +65,9 @@ class _StatusPageState extends State<StatusPage> {
         }
 
         setState(() {});
-        print("mediaTypes = $_mediaTypes");
       } else {
-        print("No file is selected.");
       }
     } catch (e) {
-      print("Error while picking file: $e");
     }
   }
 
@@ -120,7 +113,7 @@ class _StatusPageState extends State<StatusPage> {
     return  BlocBuilder<StatusCubit, StatusState>(
       builder: (context, state) {
         if (state is StatusLoaded) {
-          final statuses = state.statuses.where((element) => element.uid != widget.currentUser.uid).toList();
+          final statuses = state.statuses.where((element) => element.useruid != widget.currentUser.uid).toList();
           return BlocBuilder<GetMyStatusCubit, GetMyStatusState>(
             builder: (context, state) {
               if(state is GetMyStatusLoaded) {
@@ -227,7 +220,7 @@ class _StatusPageState extends State<StatusPage> {
                         children: [
                           const Text(
                             "My status",
-                            style: TextStyle(fontSize: 16),
+                            style: TextStyle(fontSize: 16,color:Colors.black),
                           ),
                           const SizedBox(
                             height: 2,
@@ -383,7 +376,6 @@ class _StatusPageState extends State<StatusPage> {
                     )));
           });
         } else {
-           print("my list :$myStatus");
           BlocProvider.of<StatusCubit>(context)
               .createStatus(
             status: StatusEntity(
@@ -391,7 +383,7 @@ class _StatusPageState extends State<StatusPage> {
                 createdAt: DateTime.now(),
                 stories: _stories,
                 username: currentUser.username,
-                uid: currentUser.uid,
+                useruid: currentUser.uid,
                 profileUrl: currentUser.profileUrl,
                 imageUrl: statusImageUrls[0],
                 phoneNumber: currentUser.phoneNumber),

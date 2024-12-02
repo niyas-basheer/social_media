@@ -12,7 +12,7 @@ class WelcomePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Container(
-        decoration: BoxDecoration(color: Colors.white),
+        decoration:const BoxDecoration(color: Colors.white),
         margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,

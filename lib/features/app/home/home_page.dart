@@ -4,10 +4,10 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path/path.dart' as path;
+import 'package:test_server_app/features/app/const/app_const.dart';
 import 'package:test_server_app/features/app/const/page_const.dart';
 import 'package:test_server_app/features/app/home/contacts_page.dart';
 import 'package:test_server_app/features/chat/presentation/pages/chat_page.dart';
-import 'package:test_server_app/features/status/domain/entities/status_image_entity.dart';
 import 'package:test_server_app/features/status/presentation/pages/status_page.dart';
 import 'package:test_server_app/features/user/data/data_sources/remote/user_remote_sharedprefs.dart';
 import 'package:test_server_app/features/call/presentation/cubits/my_call_history/my_call_history_cubit.dart';
@@ -36,7 +36,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
  String uid='';
   SharedPrefs sharedPrefs = SharedPrefs();
 Future<String>getuserid()async{
-    print('hello');
      uid =  await sharedPrefs.getUid()??'';
     return uid;
   }
@@ -64,12 +63,7 @@ Future<String>getuserid()async{
     super.initState();
   }
 
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    _tabController?.dispose();
-    super.dispose();
-  }
+ 
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -98,7 +92,6 @@ Future<String>getuserid()async{
     }
   }
 
-   final List<StatusImageEntity> _stories = [];
 
 
   List<File>? _selectedMedia;
@@ -135,12 +128,10 @@ Future<String>getuserid()async{
         }
 
         setState(() {});
-        print("mediaTypes = $_mediaTypes");
       } else {
-        print("No file is selected.");
       }
     } catch (e) {
-      print("Error while picking file: $e");
+      toast(e.toString());
     }
   }
 

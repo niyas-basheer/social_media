@@ -9,6 +9,8 @@ import 'package:test_server_app/features/call/presentation/pages/call_contacts_p
 import 'package:test_server_app/features/call/presentation/pages/call_page.dart';
 import 'package:test_server_app/features/chat/domian/entities/message_entity.dart';
 import 'package:test_server_app/features/chat/presentation/pages/single_chat_page.dart';
+import 'package:test_server_app/features/status/domain/entities/status_entity.dart';
+import 'package:test_server_app/features/status/presentation/pages/my_status_page.dart';
 import 'package:test_server_app/features/user/domain/entities/user_entity.dart';
 import 'package:test_server_app/features/user/presentation/pages/edit_profile_page.dart';
 
@@ -49,13 +51,13 @@ class OnGenerateRoute {
         return materialPageBuilder(const CallContactsPage());
 
       }
-      // case PageConst.myStatusPage: {
-      //   if(args is StatusEntity) {
-      //     return materialPageBuilder( MyStatusPage(status: args));
-      //   } else {
-      //     return materialPageBuilder( const ErrorPage());
-      //   }
-      // }
+      case PageConst.myStatusPage: {
+        if(args is StatusEntity) {
+          return materialPageBuilder( MyStatusPage(status: args));
+        } else {
+          return materialPageBuilder( const ErrorPage());
+        }
+      }
       case PageConst.callPage: {
         if(args is CallEntity) {
           return materialPageBuilder( CallPage(callEntity: args));

@@ -62,13 +62,13 @@ Widget _buildDialogItem(Country country) {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           CountryPickerUtils.getDefaultFlagImage(country),
-          Text(" +${country.phoneCode}",style:TextStyle(color: Colors.blue),),
+          Text(" +${country.phoneCode}",style:const TextStyle(color: Colors.blue),),
           Expanded(
             child: Text(
               " ${country.name}",
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style:TextStyle(color: Colors.blue)
+              style:const TextStyle(color: Colors.blue)
             ),
           ),
           const Spacer(),
@@ -143,7 +143,7 @@ Widget _buildDialogItem(Country country) {
                         height: 42,
                         alignment: Alignment.center,
                         child: Text(
-                          _selectedFilteredDialogCountry.phoneCode,style: TextStyle(color: Colors.blue),
+                          _selectedFilteredDialogCountry.phoneCode,style: const TextStyle(color: Colors.blue),
                         ),
                       ),
                       const SizedBox(width: 8.0),
@@ -158,7 +158,7 @@ Widget _buildDialogItem(Country country) {
                           ),
                           child: TextField(
                             controller: _phoneController,
-                            style: TextStyle(color: Colors.blue),
+                            style: const TextStyle(color: Colors.blue),
                             decoration: const InputDecoration(
                               hintText: "Phone Number",
                               border: InputBorder.none,

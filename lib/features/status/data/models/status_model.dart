@@ -14,7 +14,7 @@ class StatusModel extends StatusEntity {
   @override
   final String? imageUrl;
   @override
-  final String? uid;
+  final String? useruid;
   @override
   final String? username;
   @override
@@ -31,7 +31,7 @@ class StatusModel extends StatusEntity {
   const StatusModel( 
       {this.statusId,
       this.imageUrl,
-      this.uid,
+      this.useruid,
       this.username,
       this.profileUrl,
       this.createdAt,
@@ -40,7 +40,7 @@ class StatusModel extends StatusEntity {
       this.stories}) : super(
     statusId: statusId,
     imageUrl: imageUrl,
-    uid: uid,
+    useruid: useruid,
     username: username,
     profileUrl: profileUrl,
     createdAt: createdAt,
@@ -53,26 +53,25 @@ class StatusModel extends StatusEntity {
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'statusId': statusId,
       'imageUrl': imageUrl,
-      'uid': uid,
+      'useruid': useruid,
       'username': username,
       'profileUrl': profileUrl,
       'createdAt': createdAt?.millisecondsSinceEpoch,
       'phoneNumber': phoneNumber,
       'caption': caption,
-      'stories': stories?.map((x) => x?.toMap()).toList(),
+      'stories': stories?.map((x) => x.toMap()).toList(),
     };
   }
 
   factory StatusModel.fromMap(Map<String, dynamic> map) {
   return StatusModel(
-    statusId: map['statusId'] as String?,
+    statusId: map['_id'] as String?,
     imageUrl: map['imageUrl'] as String?,
-    uid: map['uid'] as String?,
+    useruid: map['useruid'] as String?,
     username: map['username'] as String?,
     profileUrl: map['profileUrl'] as String?,
-    createdAt: map['createdAt'] != null ? DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int) : null,
+    createdAt: map['createdAt'] !=null ? DateTime.parse(map['updatedAt']).toLocal() : null,
     phoneNumber: map['phoneNumber'] as String?,
     caption: map['caption'] as String?,
     stories: map['stories'] != null

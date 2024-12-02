@@ -4,7 +4,7 @@ import 'package:equatable/equatable.dart';
 
 class ChatEntity extends Equatable {
   final List<String> participants; 
-  final String type; 
+  final String? id;
   final String? senderUid; 
   final String? recipientUid; 
   final String? senderName;
@@ -21,8 +21,8 @@ class ChatEntity extends Equatable {
   final List<String>? messages; 
 
   const ChatEntity({
+     this.id,
     required this.participants,
-    required this.type,
     this.senderUid,
     this.recipientUid,
     this.senderName,
@@ -36,15 +36,15 @@ class ChatEntity extends Equatable {
     this.groupDescription,
     this.groupIcon,
     this.groupAdmins,
-    this.messages, 
+    this.messages, String? chatid, 
   });
 
  
 
   @override
   List<Object?> get props => [
+    id,
     participants,
-    type,
     senderUid,
     recipientUid,
     senderName,
@@ -61,5 +61,21 @@ class ChatEntity extends Equatable {
     messages,
   ];
 
-  
+  const ChatEntity.empty()
+      : id = null,
+        participants = const [],
+        senderUid = null,
+        recipientUid = null,
+        senderName = null,
+        recipientName = null,
+        recentTextMessage = null,
+        createdAt = null,
+        senderProfile = null,
+        recipientProfile = null,
+        totalUnReadMessages = 0,
+        groupName = null,
+        groupDescription = null,
+        groupIcon = null,
+        groupAdmins = null,
+        messages = null;
 }

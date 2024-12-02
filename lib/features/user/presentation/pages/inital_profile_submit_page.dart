@@ -1,15 +1,10 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:http/http.dart' as http;
-import 'package:test_server_app/features/app/const/agora_config_const.dart';
-import 'package:test_server_app/features/app/home/home_page.dart';
 import 'package:test_server_app/features/app/theme/style.dart';
 import 'package:test_server_app/features/user/data/models/user_model.dart';
-import 'package:test_server_app/features/user/domain/entities/user_entity.dart';
 import 'package:test_server_app/features/user/presentation/cubit/credential/credential_cubit.dart';
 
 class InitialProfileSubmitPage extends StatefulWidget {
@@ -35,7 +30,6 @@ class _InitialProfileSubmitPageState extends State<InitialProfileSubmitPage> {
         _file = File(pickedFile.path);
         _image = pickedFile;
       } else {
-        print("No image selected");
       }
     });
   } catch (e) {
@@ -50,8 +44,6 @@ Future<String> uploadImage() async {
 
   try {
 
-    print('Image path: ${_image!.path}');
-    print('Image name: ${_image!.name}');
 
    
     final ref = FirebaseStorage.instance.ref('User/Images/Profile').child(_image!.name);
@@ -65,7 +57,6 @@ Future<String> uploadImage() async {
     return url;
   } catch (e) {
     // Provide detailed error information
-    print('Error during upload: $e');
     throw 'Something went wrong: ${e.toString()}';
   }
 }
@@ -97,7 +88,6 @@ Future<String> uploadImage() async {
       );
       
     } catch (e) {
-      print(e.toString());
       toast("Error: $e");
     } finally {
       setState(() {

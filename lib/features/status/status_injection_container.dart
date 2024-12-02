@@ -26,7 +26,8 @@ Future<void> statusInjectionContainer() async {
       getStatusesUseCase: sl.call(),
       updateStatusUseCase: sl.call(),
       updateOnlyImageStatusUseCase: sl.call(),
-      seenStatusUpdateUseCase: sl.call()
+      seenStatusUpdateUseCase: sl.call(),
+    // getCurrentUidUseCase:sl.call()
   ));
 
   sl.registerFactory<GetMyStatusCubit>(() => GetMyStatusCubit(
@@ -65,6 +66,6 @@ Future<void> statusInjectionContainer() async {
           () => StatusRepositoryImpl(remoteDataSource: sl.call()));
 
   sl.registerLazySingleton<StatusRemoteDataSource>(() => StatusRemoteDataSourceImpl(baseUrl: 
-    Config.BaseUrl,
+    Config.baseUrl,
   ));
 }

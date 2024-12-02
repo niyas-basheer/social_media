@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:test_server_app/features/chat/data/models/message_model.dart';
 import 'package:test_server_app/features/chat/domian/entities/chat_entity.dart';
 import 'package:test_server_app/features/chat/domian/entities/message_entity.dart';
 import 'package:test_server_app/features/chat/domian/entities/message_reply_entity.dart';
@@ -24,21 +25,29 @@ class MessageCubit extends Cubit<MessageState> {
     required this.seenMessageUpdateUseCase
   }) : super(MessageInitial());
 
-  Future<void> getMessages({required MessageEntity message}) async {
-    try {
-      emit(MessageLoading());
+ Future<void> getMessages({required MessageEntity message}) async {
+  try {
 
-      final streamResponse = getMessagesUseCase.call(message);
-      streamResponse.listen((messages) {
-        emit(MessageLoaded(messages: messages));
-      });
-
-    } on SocketException {
-      emit(MessageFailure());
-    } catch (_) {
-      emit(MessageFailure());
+    if (message.recipientUid == null) {
+      emit(const MessageLoaded(messages: []));
+      return;
     }
+
+    emit(MessageLoading());
+    final streamResponse = getMessagesUseCase.call(message);
+    
+    await for (final messages in streamResponse) {
+      emit(MessageLoaded(messages: messages));
+      
+    }
+  } on SocketException {
+    emit(MessageFailure());
+  } catch (e) {
+    emit(MessageFailure());
   }
+}
+
+
 
   Future<void> deleteMessage({required MessageEntity message}) async {
     try {

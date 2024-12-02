@@ -33,7 +33,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
       } else {
-        print("No image has been selected");
       }
     });
   } catch (e) {

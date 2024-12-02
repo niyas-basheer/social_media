@@ -12,15 +12,12 @@ class SocketService {
     socket.connect();
 
     socket.onConnect((_) {
-      print('Connected to socket server');
     });
 
     socket.on('message', (data) {
-      print('Message received: $data');
     });
 
     socket.onDisconnect((_) {
-      print('Disconnected from socket server');
     });
   }
 

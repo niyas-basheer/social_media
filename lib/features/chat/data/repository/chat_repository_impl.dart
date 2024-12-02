@@ -1,5 +1,6 @@
 
 
+import 'package:test_server_app/features/chat/data/models/message_model.dart';
 import 'package:test_server_app/features/chat/data/remote/chat_remote_data_source.dart';
 import 'package:test_server_app/features/chat/domian/entities/chat_entity.dart';
 import 'package:test_server_app/features/chat/domian/entities/message_entity.dart';
@@ -15,10 +16,10 @@ class ChatRepositoryImpl implements ChatRepository {
   @override
   Future<void> deleteMessage(MessageEntity message) async => remoteDataSource.deleteMessage(message);
   @override
-  Stream<List<MessageEntity>> getMessages(MessageEntity message) => remoteDataSource.getMessages(message);
+  Stream<List<MessageModel>> getMessages(MessageEntity message) => remoteDataSource.getMessages(message);
 
   @override
-  Stream<List<ChatEntity>> getMyChat(ChatEntity chat) => remoteDataSource.getMyChat(chat);
+  Stream<List<ChatEntity>> getMyChat(ChatEntity chat) => remoteDataSource.getMyChat(chat.senderUid);
   @override
   Future<void> sendMessage(ChatEntity chat, MessageEntity message) async => remoteDataSource.sendMessage(chat, message);
 

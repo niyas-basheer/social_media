@@ -69,7 +69,7 @@ final sl = GetIt.instance;
           () => CallRepositoryImpl(remoteDataSource: sl.call()));
 
   sl.registerLazySingleton<CallRemoteDataSource>(() => CallRemoteDataSourceImpl(
-      baseUrl: Config.BaseUrl,
+      baseUrl: Config.baseUrl,
   ));
 
 }

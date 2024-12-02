@@ -6,7 +6,6 @@ import 'package:test_server_app/features/status/data/remote/status_remote_data_s
 import 'package:test_server_app/features/status/domain/entities/status_entity.dart';
 import 'package:test_server_app/features/status/domain/entities/status_image_entity.dart';
 import 'package:test_server_app/features/user/data/data_sources/remote/user_remote_sharedprefs.dart';
-import 'package:uuid/uuid.dart';
 
 class StatusRemoteDataSourceImpl implements StatusRemoteDataSource {
   final String baseUrl; // The base URL of your server
@@ -17,7 +16,6 @@ class StatusRemoteDataSourceImpl implements StatusRemoteDataSource {
   @override
   Future<void> createStatus(StatusEntity status) async {
     final url = Uri.parse('$baseUrl/api/status/status');
-    var uuid = Uuid();
     
     
       final response = await http.post(
@@ -26,11 +24,10 @@ class StatusRemoteDataSourceImpl implements StatusRemoteDataSource {
       body: jsonEncode(StatusModel(
         imageUrl: status.imageUrl,
         profileUrl: status.profileUrl,
-        uid: status.uid,
+        useruid: status.useruid,
         createdAt: status.createdAt,
         phoneNumber: status.phoneNumber,
         username: status.username,
-        statusId: uuid.v4(),
         caption: status.caption,
         stories: status.stories,
       ).toMap()),
@@ -42,6 +39,8 @@ class StatusRemoteDataSourceImpl implements StatusRemoteDataSource {
     
   }
 
+
+
   @override
   Future<void> deleteStatus(StatusEntity status) async {
     final url = Uri.parse('$baseUrl/api/status/status/${status.statusId}');
@@ -52,34 +51,58 @@ class StatusRemoteDataSourceImpl implements StatusRemoteDataSource {
     }
   }
 
-  @override
+@override
 Stream<List<StatusEntity>> getMyStatus() async* {
   try {
     String? uid = await sharedPrefs.getUid();
+    if (uid == null) {
+      throw Exception('User ID not found in shared preferences');
+    }
     final url = Uri.parse('$baseUrl/api/status/status/$uid');
     final response = await http.get(url);
-
     if (response.statusCode == 200) {
-      final List<dynamic> statusJson = jsonDecode(response.body);
+      final responseBody = jsonDecode(response.body);
+      if (responseBody is Map<String, dynamic> && responseBody['data'] != null) {
+        final dynamic statusData = responseBody['data'];
+        if (statusData is Map<String, dynamic>) {
+          final createdAt = DateTime.parse(statusData['updatedAt']).toLocal();
+          if (statusData['useruid'] == uid &&
+              createdAt.isAfter(DateTime.now().subtract(const Duration(hours: 24)))) {
+            final status = StatusModel(
+              statusId: statusData['_id'] as String?,
+              imageUrl: statusData['imageUrl'] as String?,
+              useruid: statusData['useruid'] as String?,
+              username: statusData['username'] as String?,
+              profileUrl: statusData['profileUrl'] as String?,
+              phoneNumber: statusData['phoneNumber'] as String?,
+              caption: statusData['caption'] as String?,
+              stories: (statusData['stories'] as List<dynamic>?)
+                  ?.map((story) => StatusImageEntity.fromMap(story))
+                  .toList(),
+              createdAt: createdAt,
+            );
 
-      final statusList = statusJson
-          .where((doc) => doc['uid'] == uid &&
-              DateTime.parse(doc['createdAt']).isAfter(
-                DateTime.now().subtract(const Duration(hours: 24)),
-              ))
-          .map((e) => StatusModel.fromJson(e))
-          .toList();
-
-      yield statusList;
+            yield [status];
+          } else {
+            yield [];
+          }
+        } else {
+          throw Exception('Unexpected data format for "data"');
+        }
+      } else {
+        throw Exception('Invalid response: "data" key not found');
+      }
     } else if (response.statusCode == 404) {
       yield [];
     } else {
-      throw Exception('Failed to load statuses');
+      throw Exception('Failed to load statuses. Status code: ${response.statusCode}');
     }
   } catch (e) {
     throw Exception('Error while fetching statuses: $e');
   }
 }
+
+
 
   @override
   Future<List<StatusEntity>> getMyStatusFuture() async {
@@ -90,10 +113,12 @@ Stream<List<StatusEntity>> getMyStatus() async* {
   Stream<List<StatusEntity>> getStatuses(StatusEntity status) async* {
     final url = Uri.parse('$baseUrl/api/status/statuses');
     final response = await http.get(url);
-
+   String? uid = await sharedPrefs.getUid();
     if (response.statusCode == 200) {
       final List<dynamic> statusJson = jsonDecode(response.body);
       final statusList = statusJson.map((json) => StatusModel.fromMap(json)).toList();
+     // Removes all items where the userUid matches
+     statusList.removeWhere((status) => status.useruid == uid);
       yield statusList;
     } else {
       throw Exception('Failed to load statuses');
@@ -103,11 +128,11 @@ Stream<List<StatusEntity>> getMyStatus() async* {
   @override
   Future<void> seenStatusUpdate(String statusId, int imageIndex) async {
     String? userId = await sharedPrefs.getUid();
-    final url = Uri.parse('$baseUrl/api/status/seen');
-    final response = await http.put(
+    final url = Uri.parse('$baseUrl/api/status/status/updateViewers');
+    final response = await http.patch(
       url,
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'statusId': statusId, 'imageIndex': imageIndex, 'userId': userId}),
+      body: jsonEncode({'statusId': statusId, "storyIndex": imageIndex, 'userId': userId}),
     );
 
     if (response.statusCode != 200) {

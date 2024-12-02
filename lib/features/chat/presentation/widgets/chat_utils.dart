@@ -35,6 +35,7 @@ class ChatUtils {
           message: message
       ),
       chat: ChatEntity(
+        
         participants: [messageEntity.senderUid??'',messageEntity.recipientUid??''],
         senderUid: messageEntity.senderUid,
         recipientUid: messageEntity.recipientUid,
@@ -44,7 +45,6 @@ class ChatUtils {
         recipientProfile: messageEntity.recipientProfile,
         createdAt: DateTime.now(),
         totalUnReadMessages: 0,
-        type: chattype??"",
       ),
     );
   }
@@ -84,7 +84,6 @@ class ChatUtils {
             callEntity.receiverProfileUrl,
             isCallDialed: false,
             isMissed: false));
-        print("callChannelId = $callChannelId");
       });
     });
   }

@@ -1,6 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
-import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
 
@@ -55,7 +54,7 @@ class StatusImageEntity extends Equatable {
     return StatusImageEntity(
       url: map['url'] != null ? map['url'] as String : null,
       type: map['type'] != null ? map['type'] as String : null,
-      viewers: map['viewers'] != null ? List<String>.from((map['viewers'] as List<String>) ): null,
+      viewers: map['viewers'] != null ? List<String>.from((map['viewers'] as List<dynamic>) ): null,
     );
   }
 

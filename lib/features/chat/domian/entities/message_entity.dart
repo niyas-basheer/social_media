@@ -20,9 +20,11 @@ class MessageEntity extends Equatable {
   final String? recipientProfile;
   final String? messageId;
   final String? uid;
+  final String? chatId;
 
   const MessageEntity(
       {
+        this.chatId, 
         this.senderUid,
         this.recipientUid,
         this.senderName,
@@ -46,6 +48,7 @@ class MessageEntity extends Equatable {
 
   @override
   List<Object?> get props => [
+    chatId, 
     senderUid,
     recipientUid,
     senderName,

@@ -7,7 +7,6 @@ import 'package:test_server_app/features/app/theme/style.dart';
 import 'package:test_server_app/features/chat/domian/entities/chat_entity.dart';
 import 'package:test_server_app/features/chat/domian/entities/message_entity.dart';
 import 'package:test_server_app/features/chat/presentation/cubit/chat/chat_cubit.dart';
-import 'package:test_server_app/features/user/data/data_sources/remote/user_remote_sharedprefs.dart';
 
 
 class ChatPage extends StatefulWidget {
@@ -23,7 +22,7 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     
-    BlocProvider.of<ChatCubit>(context).getMyChat(chat: ChatEntity(senderUid: widget.uid,participants: [],type: '',));
+    BlocProvider.of<ChatCubit>(context).getMyChat(chat: ChatEntity(senderUid: widget.uid,participants: [widget.uid],));
     super.initState();
   }
   
@@ -63,14 +62,14 @@ class _ChatPageState extends State<ChatPage> {
                       height: 50,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(25),
-                        child: profileWidget(),
+                        child: profileWidget(imageUrl: chat.recipientProfile),
                       ),
                     ),
-                    title: Text("${chat.recipientName}"),
-                    subtitle: Text("${chat.recentTextMessage}", maxLines: 1, overflow: TextOverflow.ellipsis,),
+                    title: Text("${chat.recipientName}",style: const TextStyle(color: Colors.black),),
+                    subtitle: Text("${chat.recentTextMessage}", maxLines: 1, overflow: TextOverflow.ellipsis,style: const TextStyle(color: Colors.grey )),
                     trailing: Text(
                       DateFormat.jm().format(chat.createdAt!),
-                      style: const TextStyle(color: greyColor, fontSize: 13),
+                      style: const TextStyle(color: Colors.black, fontSize: 13),
                     ),
                   ),
                 );

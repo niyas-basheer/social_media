@@ -86,7 +86,7 @@ Future<String>getuserid()async{
                                    child: profileWidget(imageUrl: contact.profileUrl)
                               ),
                             ),
-                            title: Text("${contact.username}",style: TextStyle(color:Colors.blue),),
+                            title: Text("${contact.username}",style:const TextStyle(color:Colors.blue),),
                             subtitle: Text("${contact.status}"),
                           );
                         },
@@ -131,7 +131,7 @@ Future<String>getuserid()async{
                             ),
                           ),
                         ),
-                        title: Text("${contact.name!.first} ${contact.name!.last}",style: TextStyle(color:Colors.blue),),
+                        title: Text("${contact.name!.first} ${contact.name!.last}",style:const TextStyle(color:Colors.blue),),
                         subtitle: const Text("Hey there! I'm using WhatsApp"),
                       );
                     },

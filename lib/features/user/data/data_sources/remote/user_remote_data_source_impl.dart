@@ -35,32 +35,16 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
   @override
    Stream<List<UserModel>> getAllUsers()async*  {
   final url = Uri.parse('$baseUrl/api/users/users');
-    
   final response = await http.get(url);
- 
-    // Decode the response body as a Map
     final Map<String, dynamic> responseData = jsonDecode(response.body);
-
-    // Extract the 'data' list from the responseData
     final List<dynamic> usersJson = responseData['data'];
-
-    // Convert the list of dynamic JSON objects to a list of UserModel objects
-    final users = usersJson.map((json) => UserModel.fromJson(json)).toList();
-
-    // Yield the list of users
     yield (usersJson)
           .map((user) => UserModel.fromJson(user))
           .toList();
-  
-  
-  
- 
-  
 }
 
   @override
   Future<String> getCurrentUID() async {
-    
     String? token = await sharedPrefs.getUid();
     if (token == null) {
       throw ServerException('Failed to get current user id');
@@ -92,18 +76,11 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
 
   @override
   Stream<UserModel>getSingleUser(String uid)async*  {
-    print('hhhhhhhh');
     final url = Uri.parse('$baseUrl/api/users/users/$uid');
-    
-   
     final response = await http.get(url);
-
       final Map<String, dynamic>responseData = jsonDecode(response.body);
       final usersJson = UserModel.fromJson(responseData['data']);
       yield usersJson;
-     
-    
-    
   }
 
   @override
@@ -187,14 +164,12 @@ Future<String> verifyPhoneNumber(String phoneNumber, String otp) async {
     
     final sharedPrefService = SharedPrefs(); 
     bool isSignedIn = await sharedPrefService.getSignInStatus();
-    print(isSignedIn);
     return isSignedIn;
     
   }
   
   @override
   Future<void> signOut() {
-    // TODO: implement signOut
     throw UnimplementedError();
   }
   

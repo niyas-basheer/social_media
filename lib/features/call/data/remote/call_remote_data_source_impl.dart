@@ -24,7 +24,6 @@ class CallRemoteDataSourceImpl implements CallRemoteDataSource {
     );
 
     if (response.statusCode != 200) {
-      print("something went wrong");
     }
   }
 
@@ -45,7 +44,7 @@ class CallRemoteDataSourceImpl implements CallRemoteDataSource {
   @override
   Stream<List<CallEntity>> getMyCallHistory() async* {
      String? uid = await sharedPrefs.getUid();
-    final url = Uri.parse('http://10.0.2.2:5001/api/calls/getMyCallHistory/$uid');
+    final url = Uri.parse('$baseUrl/api/calls/getMyCallHistory/$uid');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -92,7 +91,6 @@ class CallRemoteDataSourceImpl implements CallRemoteDataSource {
     );
 
     if (response.statusCode != 200) {
-      print("something went wrong");
     }
   }
 
@@ -117,7 +115,6 @@ class CallRemoteDataSourceImpl implements CallRemoteDataSource {
     );
 
     if (response.statusCode != 200) {
-      print("something went wrong");
     }
   }
 
@@ -135,7 +132,6 @@ class CallRemoteDataSourceImpl implements CallRemoteDataSource {
     );
 
     if (response.statusCode != 200) {
-      print("something went wrong");
     }
   }
 }

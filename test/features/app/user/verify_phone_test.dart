@@ -24,12 +24,12 @@ void main() {
   setUp(() {
     mockClient = MockClient();
     mockSharedPrefs = MockSharedPrefs();
-    userRemoteDataSource = UserRemoteDataSourceImpl(baseUrl: Config.BaseUrl);
+    userRemoteDataSource = UserRemoteDataSourceImpl(baseUrl: Config.baseUrl);
   });
 
   test('should save UID and throw ServerException when response status is not 201', () async {
     const user = UserModel(phoneNumber: '7025332088',isOnline: true,profileUrl:"//https://firebasestorage.googleapis.com/v0/b/socialmedia-441409.fire//basestorage.app/o/User%2FImages%2FProfile%2F1000000018.jpg?alt=media&token=d536e487-e9aa-4e69-9780-3b4d8e833ceb" ,status: 'active,');
-    final url = Uri.parse('${Config.BaseUrl}/api/users/users',);
+    final url = Uri.parse('${Config.baseUrl}/api/users/users',);
 
     when(mockClient.post(url,
         headers: anyNamed('headers'), body: anyNamed('body'))).thenAnswer(
@@ -43,7 +43,7 @@ void main() {
 
   test('should not call saveUid and complete normally when response status is 201', () async {
     const user = UserModel(/* initialize your user here */);
-    final url = Uri.parse('${Config.BaseUrl}/api/users/users');
+    final url = Uri.parse('${Config.baseUrl}/api/users/users');
 
     when(mockClient.post(url,
         headers: anyNamed('headers'), body: anyNamed('body'))).thenAnswer(

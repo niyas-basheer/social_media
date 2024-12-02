@@ -15,7 +15,7 @@ class MessageLoading extends MessageState {
 }
 
 class MessageLoaded extends MessageState {
-  final List<MessageEntity> messages;
+  final List<MessageModel> messages;
 
   const MessageLoaded({required this.messages});
   @override
